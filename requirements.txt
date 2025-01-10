@@ -32,7 +32,7 @@ safety_schemas==0.0.10
 typing-extensions>=4.7.1
 filelock~=3.16.1
 psutil~=6.1.0
-pyyaml==5.1.2
+pyyaml==5.4
 ipaddress
 cryptography
 django==1.1.3
