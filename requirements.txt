@@ -32,7 +32,7 @@ safety_schemas==0.0.10
 typing-extensions>=4.7.1
 filelock~=3.16.1
 psutil~=6.1.0
-pillow==3.3.0
+pillow==10.3.0
 pyyaml==5.1.2
 ipaddress
 cryptography
