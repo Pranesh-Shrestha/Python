@@ -14,11 +14,10 @@ jobs:
     name: Run build with anomalies
     steps:
       - name: Setup PSE
-        uses: ir-bhuwan-panta/pse-action@bh-test
-       # uses: invisirisk/pse-action@latest
+        uses: invisirisk/pse-action@latest
         with:
-          api_url: "https://app.dev.invisirisk.com"
-          app_token: ${{ secrets.IR_API_KEY_CHART }}
+          api_url: "https://app.invisirisk.com"
+          app_token: ${{ secrets.IR_API_KEY_AUTO }}
           
       - uses: actions/checkout@v4
 
@@ -84,14 +83,12 @@ jobs:
 
       - name: Cleanup PSE
         if: always()
-        uses: ir-bhuwan-panta/pse-action@bh-test
-        # uses: invisirisk/pse-action@latest
+        uses: invisirisk/pse-action@latest
         with:
           cleanup: "true"
 
       - name: Gather Job status
         if: always()
-        uses: ir-bhuwan-panta/pse-action@bh-test
-        # uses: invisirisk/pse-action@latest
+        uses: invisirisk/pse-action@latest
         with:
           get_jobs: "true"
