@@ -14,7 +14,7 @@ pytest-cov==4.1.0
 setuptools>=65.5.1; python_version>="3.7"
 setuptools; python_version=="3.6"
 Click>=8.0.2
-urllib3==1.23 removed because its CVE does not have CWE
+urllib3==1.23 # removed because its CVE does not have CWE
 requests
 packaging>=21.0,<=23.0
 dparse>=0.6.4
@@ -34,6 +34,6 @@ filelock~=3.16.1
 psutil~=6.1.0
 ipaddress
 cryptography
-rsa==3.3 removed because its CVE does not have CWE
+rsa==3.3 # removed because its CVE does not have CWE
 mage-ai==0.8.55 # in critical vulnerablity dataset
 rope # in critical vulnerablity dataset
