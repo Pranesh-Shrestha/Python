@@ -42,3 +42,16 @@ jobs:
         uses: invisirisk/pse-action@latest
         with:
           cleanup: "true"
+          
+  gather_analytics:
+   runs-on: ubuntu-latest
+   name: Gather Analytics
+   needs: python-application-build
+   if: always()
+   steps:
+   - name: Gather Status
+     uses: invisirisk/pse-action@v1.0.30
+     with:
+      api_url: "https://app.invisirisk.com"
+      app_token: ${{ secrets.IR_API_KEY_PROD_BLOCK }}
+      send_job_status: "true"
