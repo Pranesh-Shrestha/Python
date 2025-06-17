@@ -17,7 +17,7 @@ jobs:
         uses: invisirisk/pse-action@v1.0.30
         with:
           api_url: "https://app.invisirisk.com"
-          app_token: ${{ secrets.IR_API_KEY_PROD_DSP_ACME }}
+          app_token: ${{ secrets.IR_API_KEY_PROD_DSP_ACME_GRAD }}
           
       - uses: actions/checkout@v4
 
@@ -97,5 +97,5 @@ jobs:
      uses: invisirisk/pse-action@v1.0.30
      with:
       api_url: "https://app.invisirisk.com"
-      app_token: ${{ secrets.IR_API_KEY_PROD_DSP_ACME }}
+      app_token: ${{ secrets.IR_API_KEY_PROD_DSP_ACME_GRAD }}
       send_job_status: "true"
