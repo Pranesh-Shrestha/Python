@@ -1,4 +1,6 @@
 # InvisiRisk Build Application Firewall Demo
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2FPranesh-Shrestha%2FPython.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2FPranesh-Shrestha%2FPython?ref=badge_shield)
+
 
 This repository contains a Python application that demonstrates how InvisiRisk build application firewall works. The project serves as a boilerplate example to showcase the security features and implementation of InvisiRisk in a Python environment.
 
@@ -51,3 +53,6 @@ jobs:
         with:
           cleanup: "true"
 ```
+
+## License
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2FPranesh-Shrestha%2FPython.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2FPranesh-Shrestha%2FPython?ref=badge_large)
