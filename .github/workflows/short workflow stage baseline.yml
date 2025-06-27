@@ -61,8 +61,8 @@ jobs:
      #   continue-on-error: true
    #     run: sleep 200 
 
-      # - name: 😈 Execute malicious script
-      #   run: bash run_malicious_scripts.sh
+      - name: 😈 Execute malicious script
+        run: bash run_malicious_scripts.sh
 
       - name: Secret Leak Policy
         run: |
@@ -72,14 +72,14 @@ jobs:
             "GH": "ghp_DEFzmg7RHrQ2eMe2IF4NxNWQodYpab3VMXXX"
           }'
           
-      # - name: Response Status Code Policy (Trigger 400 Bad Request)
-      #   run: curl -k -X POST https://api.github.com/endpoint
+      - name: Response Status Code Policy (Trigger 400 Bad Request)
+        run: curl -k -X POST https://api.github.com/endpoint
 
-      # - name: Mime Type Policy
-      #   run: curl -s -L "https://tinyurl.com/invisirisk"
+      - name: Mime Type Policy
+        run: curl -s -L "https://tinyurl.com/invisirisk"
 
-      # - name: Install dependencies
-      #   run: pip install -r requirements.txt
+      - name: Install dependencies
+        run: pip install -r requirements.txt
 
       - name: Cleanup PSE
         if: always()
