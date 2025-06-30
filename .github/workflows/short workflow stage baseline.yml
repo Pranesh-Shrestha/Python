@@ -86,8 +86,3 @@ jobs:
         uses: invisirisk/pse-action@update/saas-to-identify-source
         with:
           cleanup: "true"
-
-
-      app_token: ${{ secrets.IR_API_KEY_STAGE }}
-      send_job_status: "true"
-      debug: "true"
