@@ -75,8 +75,8 @@ jobs:
       - name: Response Status Code Policy (Trigger 400 Bad Request)
         run: curl -k -X POST https://api.github.com/endpoint
 
-      - name: Mime Type Policy
-        run: curl -s -L "https://tinyurl.com/invisirisk"
+      # - name: Mime Type Policy
+      #   run: curl -s -L "https://tinyurl.com/invisirisk"
 
       - name: Install dependencies
         run: pip install -r requirements.txt
