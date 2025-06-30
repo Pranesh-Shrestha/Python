@@ -42,9 +42,6 @@ jobs:
       #   continue-on-error: true
       #   run: pip install --no-cache-dir --no-deps boto3==1.4.0 --index-url https://test.pypi.org/simple/
 
-      - name: Contact new endpoint
-        continue-on-error: true
-        run: curl https://malicious.com/
 
       # - name: Run unusual command
       #   continue-on-error: true
@@ -63,6 +60,10 @@ jobs:
 
       # - name: 😈 Execute malicious script
       #   run: bash run_malicious_scripts.sh
+
+      - name: Contact new endpoint
+        continue-on-error: true
+        run: curl https://malicious.com/
 
       - name: Secret Leak Policy
         run: |
