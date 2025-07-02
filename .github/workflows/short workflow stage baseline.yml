@@ -87,3 +87,17 @@ jobs:
         uses: invisirisk/pse-action@latest
         with:
           cleanup: "true"
+          
+  gather_analytics:
+   runs-on: ubuntu-latest
+   name: Gather Analytics
+   needs: python-application-build
+   if: always()
+   steps:
+   - name: Gather Status
+     uses: invisirisk/pse-action@update/saas-to-identify-source
+     with:
+      api_url: "https://app.stage.invisirisk.com"
+      app_token: ${{ secrets.IR_API_KEY_STAGE }}
+      send_job_status: "true"
+      debug: "true"
