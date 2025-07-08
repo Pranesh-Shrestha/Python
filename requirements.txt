@@ -36,3 +36,5 @@ qdrant-client==1.9.0 # Client for Qdrant vector database
 dagster==1.8.3 # Data orchestration platform
 prefect==2.20.4 # Workflow orchestration and automation
 modal==0.63.19 # Cloud platform for running Python code without managing infra
+numpy>=1.22.2 # not directly required, pinned by Snyk to avoid a vulnerability
+zipp>=3.19.1 # not directly required, pinned by Snyk to avoid a vulnerability
