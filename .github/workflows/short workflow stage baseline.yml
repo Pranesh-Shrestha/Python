@@ -17,7 +17,7 @@ jobs:
         uses: invisirisk/pse-action@latest
         with:
           api_url: "https://app.dev.invisirisk.com"
-          app_token: ${{ secrets.IR_API_KEY_AC_DEV }}
+          app_token: ${{ secrets.IR_API_KEY_CC_DEV }}
 
       - uses: actions/checkout@v4
 
@@ -98,6 +98,6 @@ jobs:
      uses: invisirisk/pse-action@latest
      with:
       api_url: "https://app.dev.invisirisk.com"
-      app_token: ${{ secrets.IR_API_KEY_AC_DEV }}
+      app_token: ${{ secrets.IR_API_KEY_CC_DEV }}
       send_job_status: "true"
       debug: "true"
