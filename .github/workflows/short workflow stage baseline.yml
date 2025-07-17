@@ -80,6 +80,13 @@ jobs:
       # - name: Install dependencies
       #   run: pip install -r requirements.txt
 
+      - name: Send POST request with curl
+        run: |
+          curl -X POST https://example.com/api \
+            -H "Content-Type: application/json" \
+            -d '{"key1":"value1", "key2":"value2"}'
+
+
       - name: new host      
         run: curl https://www.google.com
 
