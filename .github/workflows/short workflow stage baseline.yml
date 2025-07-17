@@ -14,10 +14,10 @@ jobs:
     name: Run build
     steps:
       - name: Setup PSE
-        uses: invisirisk/pse-action@dev-test
+        uses: invisirisk/pse-action@latest
         with:
-          api_url: "https://app.dev.invisirisk.com"
-          app_token: ${{ secrets.IR_API_KEY_DEV }}
+          api_url: "https://app.stage.invisirisk.com"
+          app_token: ${{ secrets.IR_API_KEY_EN_STAGE }}
           
       - uses: actions/checkout@v4
 
@@ -30,25 +30,25 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
-          pip install pipdeptree pip-licenses
+      #     pip install pipdeptree pip-licenses
 
-      - name: Export Dependency Tree to JSON
-        run: pipdeptree --json --warn silence > dependencies.json
+      # - name: Export Dependency Tree to JSON
+      #   run: pipdeptree --json --warn silence > dependencies.json
 
-      - name: Export License Info
-        run: pip-licenses --format=json > licenses.json
+      # - name: Export License Info
+      #   run: pip-licenses --format=json > licenses.json
 
-      - name: Convert JSON to CSV
-        run: python .github/scripts/deps_to_csv.py
+      # - name: Convert JSON to CSV
+      #   run: python .github/scripts/deps_to_csv.py
 
-      - name: Upload CSV Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: python-dependencies-csv
-          path: dependencies.csv
+      # - name: Upload CSV Artifact
+      #   uses: actions/upload-artifact@v4
+      #   with:
+      #     name: python-dependencies-csv
+      #     path: dependencies.csv
         
       - name: Cleanup PSE
         if: always()
-        uses: invisirisk/pse-action@dev-test
+        uses: invisirisk/pse-action@latest
         with:
           cleanup: "true"
