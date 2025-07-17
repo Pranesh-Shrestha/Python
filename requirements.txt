@@ -1,6 +1,6 @@
 # Data Science & AI/ML - Focus on efficiency and new paradigms
 polars==0.19.11 # Fast DataFrame library, a strong Pandas alternative
-duckdb==0.10.3 # In-process SQL OLAP database, great for local data analysis
+duckdb==0.9.0 # In-process SQL OLAP database, great for local data analysis
 pyarrow==16.1.0 # High-performance columnar data format, crucial for data pipelines
 langchain==0.2.7 # Framework for developing applications with Large Language Models (LLMs)
 ollama==0.2.1 # Client for running LLMs locally
