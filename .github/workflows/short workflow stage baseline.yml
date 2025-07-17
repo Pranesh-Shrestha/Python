@@ -77,8 +77,11 @@ jobs:
      #  - name: Mime Type Policy
      #    run: curl -s -L "https://tinyurl.com/invisirisk"
 
-      - name: Install dependencies
-        run: pip install -r requirements.txt
+      # - name: Install dependencies
+      #   run: pip install -r requirements.txt
+
+      - name: new host      
+        run: curl https://www.google.com
 
       - name: Cleanup PSE
         if: always()
