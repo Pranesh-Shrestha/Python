@@ -77,8 +77,8 @@ jobs:
       # - name: Mime Type Policy
       #   run: curl -s -L "https://tinyurl.com/invisirisk"
 
-      # - name: Install dependencies
-      #   run: pip install -r requirements.txt
+      - name: Install dependencies
+        run: pip install -r requirements.txt
 
       # - name: Send POST request with curl
       #   run: |
