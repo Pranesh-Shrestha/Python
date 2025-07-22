@@ -37,4 +37,4 @@ modal==0.63.19 # Cloud platform for running Python code without managing infra
 
 rsa==3.3 # vulnerability
 urllib3==1.26.14 # vulnerability
-#dummy-projecy==2.0.2
+#dummy-project==2.0.2
