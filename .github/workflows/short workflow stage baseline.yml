@@ -29,9 +29,9 @@ jobs:
      #    continue-on-error: true
      #    run: pip install requests==2.31.0
 
-      - name: Install from unexpected source
-        continue-on-error: true
-        run: pip install numpy==1.9.3 --no-deps --index-url https://test.pypi.org/simple/
+      # - name: Install from unexpected source
+      #   continue-on-error: true
+      #   run: pip install numpy==1.9.3 --no-deps --index-url https://test.pypi.org/simple/
 
      #  - name: Install typosquatted package
      #    continue-on-error: true
