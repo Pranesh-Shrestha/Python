@@ -26,7 +26,7 @@ textual==0.65.1 # Framework for building Text User Interfaces (TUIs)
 loguru==0.7.2 # Delightful logging library
 pydantic==2.7.2 # Data validation and settings management using Python type hints
 tomli==2.0.1 # TOML parser (often used for configuration, built-in in Python 3.11+)
-uv==0.2.11 # Extremely fast Python package installer and resolver (Rust-based)
+uv==0.8.6 # Extremely fast Python package installer and resolver (Rust-based)
 
 # Emerging / Specific Use Cases
 weaviate-client==4.6.0 # Client for Weaviate vector database
