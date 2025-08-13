@@ -14,7 +14,7 @@ fastapi==0.111.0 # Modern, fast (high-performance) web framework
 uvicorn==0.30.1 # ASGI server for FastAPI
 httpx==0.27.0 # Next-generation HTTP client
 sqlmodel==0.0.19 # SQL databases with Pydantic models, built on SQLAlchemy and Pydantic
-litestar==2.8.1 # Modern, async-first web framework with a focus on type safety
+litestar==2.17.0 # Modern, async-first web framework with a focus on type safety
 typer==0.12.3 # Build great CLIs with type hints
 strawberry-graphql==0.222.0 # Code-first Python GraphQL library
 
