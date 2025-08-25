@@ -17,6 +17,7 @@ jobs:
         with:
           api_url: "https://app.invisirisk.com"
           app_token: ${{ secrets.IR_API_KEY_S_PROD }}
+          mode: "docker-inptercept"
 
       - uses: actions/checkout@v4
 
@@ -113,6 +114,7 @@ jobs:
       app_token: ${{ secrets.IR_API_KEY_S_PROD }}
       send_job_status: "true"
       debug: "true"
+
 
 
 
