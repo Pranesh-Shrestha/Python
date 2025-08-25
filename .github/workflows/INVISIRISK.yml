@@ -25,6 +25,9 @@ jobs:
         with:
           python-version: "3.9"
 
+      - name: docker
+        run: docker pull testcontainers/ryuk:0.12.0
+
       - name: Install downgraded package
         continue-on-error: true
         run: pip install requests==2.31.0
@@ -110,6 +113,7 @@ jobs:
       app_token: ${{ secrets.IR_API_KEY_S_PROD }}
       send_job_status: "true"
       debug: "true"
+
 
 
 
