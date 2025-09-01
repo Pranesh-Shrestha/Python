@@ -12,18 +12,18 @@ jobs:
     runs-on: ubuntu-latest
     name: Run build
     steps:
-      - name: Install Git v2.50.1
-        run: |
-          # Install build dependencies for Git
-          sudo apt-get update
-          sudo apt-get install -y make libssl-dev libghc-zlib-dev libcurl4-gnutls-dev libexpat1-dev gettext wget
+      # - name: Install Git v2.50.1
+      #   run: |
+      #     # Install build dependencies for Git
+      #     sudo apt-get update
+      #     sudo apt-get install -y make libssl-dev libghc-zlib-dev libcurl4-gnutls-dev libexpat1-dev gettext wget
           
-          # Download, compile, and install Git v2.50.1
-          wget https://github.com/git/git/archive/refs/tags/v2.50.1.tar.gz -O git.tar.gz
-          tar -xzf git.tar.gz
-          cd git-2.50.1
-          make prefix=/usr/local all
-          sudo make prefix=/usr/local install
+      #     # Download, compile, and install Git v2.50.1
+      #     wget https://github.com/git/git/archive/refs/tags/v2.50.1.tar.gz -O git.tar.gz
+      #     tar -xzf git.tar.gz
+      #     cd git-2.50.1
+      #     make prefix=/usr/local all
+      #     sudo make prefix=/usr/local install
           
       - name: Verify Git Version
         run: git --version
@@ -129,3 +129,4 @@ jobs:
           app_token: ${{ secrets.IR_API_KEY_GIT_STAGE }}
           send_job_status: "true"
           debug: "true"
+
