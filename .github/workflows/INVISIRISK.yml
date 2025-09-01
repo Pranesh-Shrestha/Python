@@ -12,11 +12,27 @@ jobs:
     runs-on: ubuntu-latest
     name: Run build
     steps:
+      - name: Install Git v2.50.1
+        run: |
+          # Install build dependencies for Git
+          sudo apt-get update
+          sudo apt-get install -y make libssl-dev libghc-zlib-dev libcurl4-gnutls-dev libexpat1-dev gettext wget
+          
+          # Download, compile, and install Git v2.50.1
+          wget https://github.com/git/git/archive/refs/tags/v2.50.1.tar.gz -O git.tar.gz
+          tar -xzf git.tar.gz
+          cd git-2.50.1
+          make prefix=/usr/local all
+          sudo make prefix=/usr/local install
+          
+      - name: Verify Git Version
+        run: git --version
+         
       - name: Setup PSE
         uses: invisirisk/pse-action@latest
         with:
-          api_url: "https://app.invisirisk.com"
-          app_token: ${{ secrets.IR_API_KEY_S_PROD }}
+          api_url: "https://app.stage.invisirisk.com"
+          app_token: ${{ secrets.IR_API_KEY_GIT_STAGE }}
           mode: "docker-intercept"
 
       - uses: actions/checkout@v4
@@ -60,9 +76,9 @@ jobs:
       - name: Make cURL request
         run: curl https://package-registry.free.beeceptor.com/packages
 
-     # # - name: Simulate long-running task
-     # #   continue-on-error: true
-     # #   run: sleep 200 
+      # - name: Simulate long-running task
+      #   continue-on-error: true
+      #   run: sleep 200 
 
       # - name: 😈 Execute malicious script
       #   run: bash run_malicious_scripts.sh
@@ -91,7 +107,6 @@ jobs:
             -H "Content-Type: application/json" \
             -d '{"key1":"value1", "key2":"value2"}'
 
-
       - name: new host      
         run: curl https://www.google.com
 
@@ -102,31 +117,15 @@ jobs:
           cleanup: "true"
 
   gather_analytics:
-   runs-on: ubuntu-latest
-   name: Gather Analytics
-   needs: python-application-build
-   if: always()
-   steps:
-   - name: Gather Status
-     uses: invisirisk/pse-action@latest
-     with:
-      api_url: "https://app.invisirisk.com"
-      app_token: ${{ secrets.IR_API_KEY_S_PROD }}
-      send_job_status: "true"
-      debug: "true"
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    runs-on: ubuntu-latest
+    name: Gather Analytics
+    needs: python-application-build
+    if: always()
+    steps:
+      - name: Gather Status
+        uses: invisirisk/pse-action@latest
+        with:
+          api_url: "https://app.stage.invisirisk.com"
+          app_token: ${{ secrets.IR_API_KEY_GIT_STAGE }}
+          send_job_status: "true"
+          debug: "true"
