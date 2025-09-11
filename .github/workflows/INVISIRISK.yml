@@ -78,7 +78,7 @@ jobs:
 
       - name: Simulate long-running task
         continue-on-error: true
-        run: sleep 60
+        run: sleep 200
 
       # # # - name: 😈 Execute malicious script
       # # #   run: bash run_malicious_scripts.sh
@@ -131,6 +131,7 @@ jobs:
           app_token: ${{ secrets.IR_API_KEY_PROD_NEW }}
           send_job_status: "true"
           debug: "true"
+
 
 
 
