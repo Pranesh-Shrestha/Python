@@ -9,7 +9,7 @@ permissions:
 
 jobs:
   python-application-build:
-    runs-on: macos-latest
+    runs-on: ubuntu-latest
     name: Run build
     steps:
       # - name: Install Git v2.50.1
@@ -131,6 +131,7 @@ jobs:
           app_token: ${{ secrets.IR_API_KEY_PROD_NEW }}
           send_job_status: "true"
           debug: "true"
+
 
 
 
