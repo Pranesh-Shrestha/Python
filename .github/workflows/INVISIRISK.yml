@@ -118,7 +118,7 @@ jobs:
 
       - name: Cleanup PSE
         if: always()
-        uses: invisirisk/pse-action@latest
+        uses: invisirisk/pse-action@dev-test
         with:
           cleanup: "true"
 
@@ -135,6 +135,7 @@ jobs:
           app_token: ${{ secrets.IR_API_KEY_STAGE_QP }}
           send_job_status: "true"
           debug: "true"
+
 
 
 
