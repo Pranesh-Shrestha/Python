@@ -76,9 +76,9 @@ jobs:
       # - name: Make cURL request
       #   run: curl https://package-registry.free.beeceptor.com/packages
 
-      - name: Simulate long-running task
-        continue-on-error: true
-        run: sleep 200
+      # - name: Simulate long-running task
+      #   continue-on-error: true
+      #   run: sleep 200
 
       # # # - name: 😈 Execute malicious script
       # # #   run: bash run_malicious_scripts.sh
@@ -135,6 +135,7 @@ jobs:
           app_token: ${{ secrets.IR_API_KEY_STAGE_QP }}
           send_job_status: "true"
           debug: "true"
+
 
 
 
