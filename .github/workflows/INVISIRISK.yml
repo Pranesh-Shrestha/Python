@@ -113,6 +113,12 @@ jobs:
       # - name: new host      
       #   run: curl https://www.google.com
 
+      - name: Simple PUT request
+        run: |
+          curl -X PUT https://example.com/api/resource \
+          -H "Content-Type: application/json" \
+          -d '{"key": "value"}'
+
       - name: Install dependencies
         run: pip install -r requirements.txt
 
@@ -135,6 +141,7 @@ jobs:
           app_token: ${{ secrets.IR_API_KEY_CB_STAGE }}
           send_job_status: "true"
           debug: "true"
+
 
 
 
