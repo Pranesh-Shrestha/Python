@@ -55,7 +55,7 @@ jobs:
 
       - name: Install typosquatted package
         continue-on-error: true
-        run: curl -k -O https://files.pythonhosted.org/packages/c7/2c/94ed7b91db81d61d7096ac8f2d325ec562fc75e35f3baea8749c85b28784/123bla-0.0.1.tar.gz
+        run: curl -k -O https://files.pythonhosted.org/packages/83/5c/0627be4c9976d56b1217cb5187b7504e7fd7d3503f8bfd312a04077bd4f7/abilityrequests-0.0.5-py2.py3-none-any.whl.metadata
 
       # - name: Install with different checksum
       #   continue-on-error: true
@@ -113,14 +113,14 @@ jobs:
       # - name: new host      
       #   run: curl https://www.google.com
 
-      - name: Simple PUT request
-        run: |
-          curl -X PUT https://example.com/api/resource \
-          -H "Content-Type: application/json" \
-          -d '{"key": "value"}'
+      # - name: Simple PUT request
+      #   run: |
+      #     curl -X PUT https://example.com/api/resource \
+      #     -H "Content-Type: application/json" \
+      #     -d '{"key": "value"}'
 
-      - name: Install dependencies
-        run: pip install -r requirements.txt
+      # - name: Install dependencies
+      #   run: pip install -r requirements.txt
 
       - name: Cleanup PSE
         if: always()
@@ -141,6 +141,7 @@ jobs:
           app_token: ${{ secrets.IR_API_KEY_CB_STAGE }}
           send_job_status: "true"
           debug: "true"
+
 
 
 
