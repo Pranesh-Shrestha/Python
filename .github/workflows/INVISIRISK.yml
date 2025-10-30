@@ -142,12 +142,3 @@ jobs:
           app_token: ${{ secrets.IR_API_KEY_CB_STAGE }}
           send_job_status: "true"
           debug: "true"
-
-
-
-
-
-
-
-
-
