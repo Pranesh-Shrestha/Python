@@ -58,7 +58,7 @@ jobs:
       #   run: curl -k -O https://files.pythonhosted.org/packages/83/5c/0627be4c9976d56b1217cb5187b7504e7fd7d3503f8bfd312a04077bd4f7/abilityrequests-0.0.5-py2.py3-none-any.whl.metadata
 
       - name: Curl blacklisted host (Custom Builtins)
-        run: curl ethical-points-competitive-fluid.trycloudflare.com
+        run: curl https://ethical-points-competitive-fluid.trycloudflare.com
 
       # - name: Install with different checksum
       #   continue-on-error: true
@@ -142,6 +142,7 @@ jobs:
           app_token: ${{ secrets.IR_API_KEY_CB_STAGE }}
           send_job_status: "true"
           debug: "true"
+
 
 
 
