@@ -39,6 +39,7 @@ rsa==3.3 # vulnerability
 urllib3==1.26.14 # vulnerability
 dummy-project==2.0.2
 boto3
+# MALWARE PACKAGES
 yuzo==1.0.0
 web3eth==7.13.0
 rbx1325382==0.1.0
