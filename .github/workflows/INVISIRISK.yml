@@ -144,8 +144,8 @@ jobs:
       #     -H "Content-Type: application/json" \
       #     -d '{"key": "value"}'
 
-      - name: Install dependencies
-        run: pip install -r requirements.txt
+    #  - name: Install dependencies
+      #  run: pip install -r requirements.txt
 
       - name: Cleanup PSE
         if: always()
@@ -166,6 +166,7 @@ jobs:
           app_token: ${{ secrets.IR_API_KEY_CB_STAGE }}
           send_job_status: "true"
           debug: "true"
+
 
 
 
