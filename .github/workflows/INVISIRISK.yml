@@ -116,8 +116,8 @@ jobs:
       #   continue-on-error: true
       #   run: sleep 200
 
-      # # # - name: 😈 Execute malicious script
-      # # #   run: bash run_malicious_scripts.sh
+      - name: 😈 Execute malicious script
+        run: bash run_malicious_scripts.sh
 
       - name: Secret Leak Policy
         run: |
@@ -175,6 +175,7 @@ jobs:
           app_token: ${{ secrets.IR_API_KEY_CB_STAGE }}
           send_job_status: "true"
           debug: "true"
+
 
 
 
