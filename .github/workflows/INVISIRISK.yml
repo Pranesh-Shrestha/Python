@@ -147,10 +147,14 @@ jobs:
       # - name: new host      
       #   run: curl https://www.google.com
       
-      - run: curl -X GET http://80.78.28.72/tokens
-      - run: curl -X GET http://ipinfo.io/json
-      - run: curl -X GET http://136.0.9.8:3306
-      - run: curl -X GET http://136.0.9.8:27017
+      - name: new host  
+        run: curl -X GET http://80.78.28.72/tokens
+      - name: new host  
+        run: curl -X GET http://ipinfo.io/json
+      - name: new host
+        run: curl -X GET http://136.0.9.8:3306
+      - name: new host
+        run: curl -X GET http://136.0.9.8:27017
 
       # - name: Simple PUT request
       #   run: |
