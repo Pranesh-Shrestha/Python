@@ -147,6 +147,12 @@ jobs:
       # - name: new host      
       #   run: curl https://www.google.com
 
+      - name: RAT attack and rspack attack    
+      - run: curl -X GET http://80.78.28.72/tokens
+      - run: curl -X GET http://ipinfo.io/json
+      - run: curl -X GET http://136.0.9.8:3306
+      - run: curl -X GET http://136.0.9.8:27017
+
       # - name: Simple PUT request
       #   run: |
       #     curl -X PUT https://example.com/api/resource \
@@ -175,6 +181,7 @@ jobs:
           app_token: ${{ secrets.IR_API_KEY_CB_STAGE }}
           send_job_status: "true"
           debug: "true"
+
 
 
 
