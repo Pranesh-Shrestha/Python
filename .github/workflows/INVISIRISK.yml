@@ -148,8 +148,8 @@ jobs:
       #       -H "Content-Type: application/json" \
       #       -d '{"key1":"value1", "key2":"value2"}'
 
-      # - name: new host      
-      #   run: curl https://www.google.com
+      - name: new host      
+        run: curl https://www.google.com
       
    #   - name: new host  
    #     run: curl -X GET http://80.78.28.72/tokens
@@ -188,6 +188,7 @@ jobs:
           app_token: ${{ secrets.IR_API_KEY_CB_STAGE }}
           send_job_status: "true"
           debug: "true"
+
 
 
 
