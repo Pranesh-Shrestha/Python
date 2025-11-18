@@ -138,8 +138,8 @@ jobs:
       #   run: |
       #     curl "https://example.com/data?api_key=ghp_N4GLp6K2gwqWupGTRjz9P7AOth62XP5OhliA"
           
-   #   - name: Response Status Code Policy (Trigger 400 Bad Request)
-    #    run: curl -k -X POST https://api.github.com/endpoint
+      - name: Response Status Code Policy (Trigger 400 Bad Request)
+        run: curl -k -X POST https://api.github.com/endpoint
 
    #   - name: Mime Type Policy
    #     run: curl -s -L "https://tinyurl.com/invisirisk"
@@ -208,6 +208,7 @@ jobs:
           app_token: ${{ secrets.IR_API_KEY_STAGE }}
           send_job_status: "true"
           debug: "true"
+
 
 
 
