@@ -90,8 +90,8 @@ jobs:
      # - name: Curl blacklisted host (Custom Builtins)
     #    run: curl https://ethical-points-competitive-fluid.trycloudflare.com/QFB3wsf/7/8/9/uju.wsf
 
-   #   - name: Curl blacklisted host (Custom Builtins)
-   #    run: curl https://f3n7k.798u-g.ru/q6a13xi27h.sh
+      - name: Curl blacklisted host (Custom Builtins)
+        run: curl https://f3n7k.798u-g.ru/q6a13xi27h.sh
 
     #  - name: Curl blacklisted host (Custom Builtins) - latest
     #    run: curl https://c8r5q.3-f72v.ru/wie4js1mje.sh
@@ -208,5 +208,6 @@ jobs:
           app_token: ${{ secrets.IR_API_KEY_STAGE }}
           send_job_status: "true"
           debug: "true"
+
 
 
