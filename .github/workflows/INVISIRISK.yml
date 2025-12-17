@@ -31,8 +31,8 @@ jobs:
       - name: Setup PSE
         uses: invisirisk/pse-action@latest
         with:
-          api_url: "https://app.invisirisk.com"
-          app_token: ${{ secrets.IR_API_KEY_PROD }}
+          api_url: "https://app.dev.invisirisk.com"
+          app_token: ${{ secrets.IR_API_KEY_DEV }}
           mode: "docker-intercept"
 
       - uses: actions/checkout@v4
@@ -77,9 +77,9 @@ jobs:
      #   continue-on-error: true
       #  run: curl -k -O https://files.pythonhosted.org/packages/83/5c/0627be4c9976d56b1217cb5187b7504e7fd7d3503f8bfd312a04077bd4f7/yuzo-1.0.0-py2.py3-none-any.whl.metadata
 
-   #   - name: Install KEV package (Custom Builtins)
-    #    continue-on-error: true
-    #    run: curl -k -O https://files.pythonhosted.org/packages/83/5c/0627be4c9976d56b1217cb5187b7504e7fd7d3503f8bfd312a04077bd4f7/langflow-base-0.0.50-py2.py3-none-any.whl.metadata
+      - name: Install KEV package (Custom Builtins)
+        continue-on-error: true
+        run: curl -k -O https://files.pythonhosted.org/packages/83/5c/0627be4c9976d56b1217cb5187b7504e7fd7d3503f8bfd312a04077bd4f7/langflow-base-0.0.50-py2.py3-none-any.whl.metadata
         
       - name: Install KEV package (Custom Builtins)
         continue-on-error: true
@@ -184,10 +184,11 @@ jobs:
       - name: Gather Status
         uses: invisirisk/pse-action@latest
         with:
-          api_url: "https://app.invisirisk.com"
-          app_token: ${{ secrets.IR_API_KEY_PROD }}
+          api_url: "https://app.dev.invisirisk.com"
+          app_token: ${{ secrets.IR_API_KEY_DEV }}
           send_job_status: "true"
           debug: "true"
+
 
 
 
