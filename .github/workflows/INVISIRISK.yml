@@ -1,9 +1,6 @@
 name: Automation Policy Applied
 
 on:
-  schedule:
-    - cron: "05 0 * * *" # 5:50 AM NPT (12:05 AM UTC)
-    - cron: "15 7 * * *" # 1:00 PM NPT (87:15 AM UTC)
   workflow_dispatch:
 
 permissions:
@@ -17,10 +14,10 @@ jobs:
     name: Run build with anomalies
     steps:
       - name: Setup PSE
-        uses: invisirisk/pse-action@latest
+        uses: invisirisk/pse-action@dev-test
         with:
-          api_url: "https://app.invisirisk.com"
-          app_token: ${{ secrets.IR_API_KEY_PROD_POLICY }}
+          api_url: "https://app.dev.invisirisk.com"
+          app_token: ${{ secrets.IR_API_KEY_POLICY }}
           
       - uses: actions/checkout@v4
 
@@ -63,6 +60,8 @@ jobs:
       # - name: Simulate long-running task
       #   continue-on-error: true
       #   run: sleep 200 
+
+      
       - name: Dummy PUT request (Unauthorized PUT Action)
         run: |
           curl -X PUT "https://httpbin.org/put"
@@ -103,7 +102,7 @@ jobs:
 
       - name: Cleanup PSE
         if: always()
-        uses: invisirisk/pse-action@latest
+        uses: invisirisk/pse-action@dev-test
         with:
           cleanup: "true"
 
@@ -114,9 +113,10 @@ jobs:
          if: always()
          steps:
          - name: Gather Status
-           uses: invisirisk/pse-action@latest
+           uses: invisirisk/pse-action@dev-test
            with:
-            api_url: "https://app.invisirisk.com"
-            app_token: ${{ secrets.IR_API_KEY_PROD_POLICY }}
+            api_url: "https://app.dev.invisirisk.com"
+            app_token: ${{ secrets.IR_API_KEY_POLICY }}
             send_job_status: "true"
             debug: "true"
+
