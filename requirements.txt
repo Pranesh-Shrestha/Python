@@ -1,2 +1,2 @@
 PyMySQL==1.1.0
-pytest-crated==0.4.1
+pytest-cratedb==0.4.1
