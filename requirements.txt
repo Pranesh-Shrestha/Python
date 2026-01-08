@@ -1,4 +1,4 @@
-PyMySQL==1.1.0
-pytest-cratedb==0.4.1
+PyMySQL==1.1.0 
+pytest-cratedb==0.4.1 #stability
 internetarchive==1.8.5 #Critical 
 langflow==0.5.3 #KEV
