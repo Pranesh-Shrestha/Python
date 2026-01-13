@@ -109,6 +109,30 @@ jobs:
         continue-on-error: true
         run: curl -k -O https://files.pythonhosted.org/packages/33/62/30f6936941d87a5ed72efb24249437824f6b2c953901245b58c91fde2f27/cryptography-3.1.1-cp35-abi3-manylinux2010_x86_64.whl
 
+      - name: StabilityBufferPeriod Jan 13, 2026 (Python)
+        continue-on-error: true
+        run: curl -k -O https://files.pythonhosted.org/packages/a0/c3/a0dcae019de40816352462371c473b22639cd8e68f33a5f23f07faf330fd/endesive-2.19.3-py3-none-any.whl
+
+      - name: StabilityBufferPeriod Jan 13, 2026 (npm)
+        continue-on-error: true
+        run: curl -k -O https://registry.npmjs.org/next/-/next-16.1.1-canary.23.tgz
+
+      - name: StabilityBufferPeriod Jan 13, 2026 (Ruby)
+        continue-on-error: true
+        run: curl -k -O https://rubygems.org/gems/aws-partitions-1.1203.0.gem
+
+      - name: StabilityBufferPeriod Jan 13, 2026 (Maven)
+        continue-on-error: true
+        run: curl -k -O https://repo1.maven.org/maven2/tz/co/asoft/kiota-url/3.3.5/kiota-url-3.3.5.jar
+
+      - name: StabilityBufferPeriod Jan 13, 2026 (Golang)
+        continue-on-error: true
+        run: curl -k -O https://proxy.golang.org/github.com/mattermost/mattermost/server/v8/@v/v8.0.0-20260113020941-d61635fc4ad7.zip
+
+      - name: StabilityBufferPeriod Jan 13, 2026 (nuget)
+        continue-on-error: true
+        run: curl -k -O https://api.nuget.org/v3-flatcontainer/NOF.Infrastructure.StackExchangeRedis/5.2.2/NOF.Infrastructure.StackExchangeRedis.5.2.2.nupkg
+
       - name: Make Blacklisted URL (in dataset) (Custom Builtins)
         run: curl -k https://cdn.jsdelivr.net/gh/Fabriziovigna11/mn-authz-x7/s5-r9
 
@@ -200,6 +224,7 @@ jobs:
             app_token: ${{ secrets.IR_API_KEY_POLICY_PROD }}
             send_job_status: "true"
             debug: "true"
+
 
 
 
