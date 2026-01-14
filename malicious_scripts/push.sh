@@ -17,4 +17,4 @@ git commit -m "Add a new file inside new_folder"
 
 echo "Pushing changes to the STAGE branch..."
 git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
-git push origin CHART
+git push origin Policy
