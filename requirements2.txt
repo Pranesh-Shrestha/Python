@@ -31,7 +31,7 @@ uv==0.2.11 # Extremely fast Python package installer and resolver (Rust-based)
 # Emerging / Specific Use Cases
 weaviate-client==4.6.0 # Client for Weaviate vector database
 qdrant-client==1.9.0 # Client for Qdrant vector database
-dagster==1.8.3 # Data orchestration platform
+dagster==1.12.9 # Data orchestration platform
 prefect==2.20.4 # Workflow orchestration and automation
 modal==0.63.19 # Cloud platform for running Python code without managing infra
 
