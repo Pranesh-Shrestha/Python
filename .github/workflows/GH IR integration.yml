@@ -13,6 +13,12 @@ jobs:
         node-version: [18.x]
 
     steps:
+      # ============= InvisiRisk Setup =============
+      - name: Setup PSE
+        uses: invisirisk/pse-action@latest
+        with:
+          app_token: ${{secrets.IR_API_KEY}}
+      # ============= InvisiRisk Setup End =============
       # Checkout repository
       - name: Checkout code
         uses: actions/checkout@v4
@@ -31,3 +37,10 @@ jobs:
       # Build project
       - name: Build
         run: npm run build
+      # ============= InvisiRisk Cleanup =============
+      - name: Cleanup PSE
+        if: always()
+        uses: invisirisk/pse-action@latest
+        with:
+          cleanup: "true"
+      # ============= InvisiRisk Cleanup End =============
