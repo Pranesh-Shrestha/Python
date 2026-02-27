@@ -7,9 +7,6 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
-    strategy:
-      matrix:
-        node-version: [18.x]
 
     steps:
       # ============= InvisiRisk Setup =============
@@ -26,9 +23,6 @@ jobs:
       # Setup Node.js
       - name: Setup Node.js
         uses: actions/setup-node@v4
-        with:
-          node-version: ${{ matrix.node-version }}
-          cache: 'npm'
 
       # Install dependencies
       - name: Install dependencies
