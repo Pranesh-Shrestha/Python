@@ -20,17 +20,14 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # Setup Node.js
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - name: Use Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.9"
 
-      # Install dependencies
       - name: Install dependencies
-        run: npm install
+        run: pip install -r requirements.txt
 
-      # Build project
-      - name: Build
-        run: npm run build
       # ============= InvisiRisk Cleanup =============
       - name: Cleanup PSE
         if: always()
