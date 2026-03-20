@@ -1,4 +1,4 @@
-name: Node.js CI
+name: dependency tree python
 
 on:
   workflow_dispatch:
