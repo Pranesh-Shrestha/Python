@@ -35,7 +35,10 @@ dagster==1.8.3 # Data orchestration platform
 prefect==2.20.4 # Workflow orchestration and automation
 modal==0.63.19 # Cloud platform for running Python code without managing infra
 
-rsa==3.3 # vulnerability
-urllib3==1.26.14 # vulnerability
+rsa==4.7 # vulnerability
+urllib3==2.6.3 # vulnerability
 dummy-project==2.0.2
 boto3
+numpy>=1.22.2 # not directly required, pinned by Snyk to avoid a vulnerability
+pyasn1>=0.6.3 # not directly required, pinned by Snyk to avoid a vulnerability
+zipp>=3.19.1 # not directly required, pinned by Snyk to avoid a vulnerability
