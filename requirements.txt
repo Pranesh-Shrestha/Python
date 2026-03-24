@@ -1,0 +1,4 @@
+flask
+boto3
+requests
+pyload-ng==0.5.0b3.dev96
