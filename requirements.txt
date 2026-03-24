@@ -39,3 +39,4 @@ modal==0.63.19 # Cloud platform for running Python code without managing infra
 #urllib3==1.26.14 # vulnerability
 #dummy-project==2.0.2
 #boto3
+mindsql==0.2.1
