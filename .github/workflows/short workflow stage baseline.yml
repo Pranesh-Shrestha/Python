@@ -1,4 +1,4 @@
-name: Test All Anomalies with Continue on Error
+name: run prod demo python
 
 on:
   workflow_dispatch:
