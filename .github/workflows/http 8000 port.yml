@@ -1,0 +1,12 @@
+name: http 8000 port
+
+on:
+  workflow_dispatch:
+
+jobs:
+  curl-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Curl test (port 8000 + path)
+        run: |
+          curl -v --max-time 10 http://httpbin.org:8000/anything/6202033 || true
