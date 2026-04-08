@@ -27,8 +27,12 @@ jobs:
 
       - name: Install dependencies
         run: pip install -r requirements.txt
+      
+      - name: Install pipdeptree
+        run: pip install pipdeptree
 
-
+      - name: Show dependency tree
+        run: pipdeptree
 
       # ============= InvisiRisk Cleanup =============
       - name: Cleanup PSE
