@@ -1,4 +1,4 @@
-# InvisiRisk Build Application Firewall Demo
+# InvisiRisk Build Application Firewall Demo 2
 
 This repository contains a Python application that demonstrates how InvisiRisk build application firewall works. The project serves as a boilerplate example to showcase the security features and implementation of InvisiRisk in a Python environment.
 
