@@ -1,6 +1,9 @@
 name: Python application
 on:
   workflow_dispatch:
+  pull_request:
+   branches:
+      - CHART
 
 permissions:
   checks: write
@@ -30,12 +33,11 @@ jobs:
          
       # ============= InvisiRisk Setup =============
       - name: Setup PSE
-        uses: invisirisk/pse-action@latest
+        uses: invisirisk/pse-action@develop
         with:
-          api_url: "https://app.invisirisk.com"
+          api_url: "https://app.dev.invisirisk.com"
           #api_url: "https://app.stage.invisirisk.com"
           app_token: ${{ secrets.IR_API_KEY }}
-          mode: "docker-intercept"
       # ============= InvisiRisk Setup End =============
       - uses: actions/checkout@v4
 
@@ -75,8 +77,8 @@ jobs:
       #   continue-on-error: true
       #   run: sleep 200
 
-      - name: 😈 Execute malicious script
-        run: bash run_malicious_scripts.sh
+      #- name: 😈 Execute malicious script
+       # run: bash run_malicious_scripts.sh
 
       - name: Secret Leak Policy
         run: |
@@ -222,25 +224,4 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
-      # ============= InvisiRisk Cleanup =============
-      - name: Cleanup PSE
-        if: always()
-        uses: invisirisk/pse-action@latest
-        with:
-          cleanup: "true"
-      # ============= InvisiRisk Cleanup End =============
 
-  gather_analytics:
-    runs-on: ubuntu-latest
-    name: Gather Analytics
-    needs: python-application-build
-    if: always()
-    steps:
-      - name: Gather Status
-        uses: invisirisk/pse-action@latest
-        with:
-          api_url: "https://app.invisirisk.com"
-          #api_url: "https://app.stage.invisirisk.com"
-          app_token: ${{ secrets.IR_API_KEY }}
-          send_job_status: "true"
-          debug: "true"
