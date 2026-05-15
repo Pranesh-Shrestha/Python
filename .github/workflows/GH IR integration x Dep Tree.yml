@@ -46,9 +46,9 @@ jobs:
       #   run: curl -k -O https://files.pythonhosted.org/packages/83/5c/0627be4c9976d56b1217cb5187b7504e7fd7d3503f8bfd312a04077bd4f7/pandasai-0.8.1-py2.py3-none-any.whl
 
 
-      # - run: curl -k -O https://rubygems.org/downloads/foreman-tasks-12.2.1.gem
-      # - run: curl -k -O https://repo1.maven.org/maven2/org/jetbrains/kotlin/kotlin-stdlib/2.4.0-RC/kotlin-stdlib-2.3.21.jar
-      # - run: curl -k -O https://api.nuget.org/v3-flatcontainer/KeepDynamic.Ocr.Fraktur/6.0.0.10/KeepDynamic.Ocr.Fraktur.6.0.0.10.nupkg
+      - run: curl -k -O https://rubygems.org/downloads/foreman-tasks-12.2.1.gem
+      - run: curl -k -O https://repo1.maven.org/maven2/org/jetbrains/kotlin/kotlin-stdlib/2.4.0-RC/kotlin-stdlib-2.3.21.jar
+      - run: curl -k -O https://api.nuget.org/v3-flatcontainer/KeepDynamic.Ocr.Fraktur/6.0.0.10/KeepDynamic.Ocr.Fraktur.6.0.0.10.nupkg
       
 
       # ============= InvisiRisk Cleanup =============
