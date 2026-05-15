@@ -45,6 +45,10 @@ jobs:
       #   continue-on-error: true
       #   run: curl -k -O https://files.pythonhosted.org/packages/83/5c/0627be4c9976d56b1217cb5187b7504e7fd7d3503f8bfd312a04077bd4f7/pandasai-0.8.1-py2.py3-none-any.whl
 
+
+      - run: curl -k -O https://rubygems.org/downloads/foreman-tasks-12.2.1.gem
+      
+
       # ============= InvisiRisk Cleanup =============
       - name: Cleanup PSE
         if: always()
