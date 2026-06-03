@@ -46,3 +46,6 @@ jobs:
       - name: Install random PyPI package
         run: pip install requests
 
+      - name: Curl Google
+        run: curl -I https://www.google.com
+
