@@ -27,6 +27,9 @@ jobs:
       - name: Install random npm package
         run: npm install lodash
 
+      - name: Install npm package 
+        run: npm install
+
   install-python-package:
     name: Install PyPI package
     runs-on: ubuntu-latest
