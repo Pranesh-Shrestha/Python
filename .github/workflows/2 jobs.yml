@@ -24,8 +24,8 @@ jobs:
         with:
           node-version: 20
 
-      - name: Install npm packages
-        run: npm install
+      - name: Install random npm package
+        run: npm install lodash
 
   install-python-package:
     name: Install PyPI package
@@ -40,5 +40,6 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Install package from PyPI
+      - name: Install random PyPI package
         run: pip install requests
+
