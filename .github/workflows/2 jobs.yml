@@ -1,0 +1,44 @@
+name: Simple Package Workflow
+
+on:
+  workflow_dispatch:
+
+jobs:
+  install-node-deps:
+    name: Install npm dependencies
+    runs-on: ubuntu-latest
+
+    steps:
+        # ============= InvisiRisk Setup =============
+      - name: Setup PSE
+        uses:  invisirisk/pse-action@develop
+        with:
+          api_url: "https://app.stage.invisirisk.com"
+          app_token: a5I0eoXVNrn0iCYIIioRBZtLV3t2Btw5_O5hPs41hiFJ9epkXVStn7xrOHza6c1vFLC8NNW5Rc2R5FPWaZicCw
+      # ============= InvisiRisk Setup End =============
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install npm packages
+        run: npm install
+
+  install-python-package:
+    name: Install PyPI package
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install package from PyPI
+        run: pip install requests
