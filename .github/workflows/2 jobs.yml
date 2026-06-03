@@ -27,8 +27,11 @@ jobs:
       - name: Install random npm package
         run: npm install lodash
 
-      - name: Intentional failure
-        run: exit 1
+      # - name: Intentional failure
+      #   run: exit 1
+      
+      - name: Curl Google
+        run: curl -I https://www.google.com
 
   install-python-package:
     name: Install PyPI package
