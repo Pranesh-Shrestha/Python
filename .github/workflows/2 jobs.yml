@@ -1,4 +1,4 @@
-name: Simple Package Workflow
+name: 2 jobs one PSE
 
 on:
   workflow_dispatch:
