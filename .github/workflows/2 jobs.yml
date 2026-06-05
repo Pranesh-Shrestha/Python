@@ -15,6 +15,7 @@ jobs:
         with:
           api_url: "https://app.stage.invisirisk.com"
           app_token: 38-lV3dwtbDVNp9HAOs_Q4nZBVnqlmTNduRNFFAJh1sS3XJomrAmgVqSS6C6oZgaEfPbwaJAlwaopwX-J94RYA
+          debug: true
       # ============= InvisiRisk Setup End =============
       - name: Check out repository
         uses: actions/checkout@v4
