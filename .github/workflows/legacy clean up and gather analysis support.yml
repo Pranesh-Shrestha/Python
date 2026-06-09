@@ -17,6 +17,7 @@ jobs:
         with:
           api_url: "https://app.invisirisk.com"
           app_token: I7fVFi6tBeS4Olo5iElTdJBLHXX5creNZa4LM4kA-Scwo76-DhLGjDcjcrKO12Qi9Eo_Qr3L4j2FDXgAB22weA
+          collect_job_status: false
           
       - uses: actions/checkout@v4
 
