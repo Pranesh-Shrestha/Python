@@ -1,0 +1,61 @@
+name: legacy clean up and gather analysis support
+on:
+  workflow_dispatch:
+
+permissions:
+  checks: write
+  contents: write
+  packages: read
+
+jobs:
+  python-application-build:
+    runs-on: ubuntu-latest
+    name: Run build with anomalies
+    steps:
+      - name: Setup PSE
+        uses: invisirisk/pse-action@develop
+        with:
+          api_url: "https://app.invisirisk.com"
+          app_token: I7fVFi6tBeS4Olo5iElTdJBLHXX5creNZa4LM4kA-Scwo76-DhLGjDcjcrKO12Qi9Eo_Qr3L4j2FDXgAB22weA
+          
+      - uses: actions/checkout@v4
+
+      - name: Use Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.13"
+
+      - name: Install downgraded package
+        continue-on-error: true
+        run: pip install requests==2.31.0
+
+      - name: Install from unexpected source
+        continue-on-error: true
+        run: pip install numpy==1.9.3 --no-deps --index-url https://test.pypi.org/simple/
+
+      - name: Install typosquatted package
+        continue-on-error: true
+        run: curl -k -O https://files.pythonhosted.org/packages/83/5c/0627be4c9976d56b1217cb5187b7504e7fd7d3503f8bfd312a04077bd4f7/requestss-7.2.0-py2.py3-none-any.whl.metadata
+
+      - name: Cleanup PSE
+        if: always()
+        uses: invisirisk/pse-action@develop
+        with:
+          cleanup: "true"
+          
+  gather_analytics:
+         runs-on: ubuntu-latest
+         name: Gather Analytics
+         needs: python-application-build
+         if: always()
+         steps:
+         - name: Gather Status
+           uses: invisirisk/pse-action@develop
+           with:
+            api_url: "https://app.invisirisk.com"
+            app_token: I7fVFi6tBeS4Olo5iElTdJBLHXX5creNZa4LM4kA-Scwo76-DhLGjDcjcrKO12Qi9Eo_Qr3L4j2FDXgAB22weA
+            send_job_status: "true"
+            debug: "true"
+
+
+
