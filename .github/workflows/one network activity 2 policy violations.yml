@@ -29,4 +29,26 @@ jobs:
       - name: Install stability buffer package
         run: npm install table-js@10.0.0-esm.0
 
+
+    
+      - name: Cleanup PSE
+        if: always()
+        uses: invisirisk/pse-action@latest
+        with:
+          cleanup: "true"
+          
+  gather_analytics:
+         runs-on: ubuntu-latest
+         name: Gather Analytics
+         needs: python-application-build
+         if: always()
+         steps:
+         - name: Gather Status
+           uses: invisirisk/pse-action@latest
+           with:
+            api_url: "https://app.dev.invisirisk.com"
+            app_token: SZhakDg-w5qUdiAo1oY9q9C7sTI1vs6IMVRmUZwgUq8d9Vb9Y0CjtsQdZIYVphCDHLNZ83_-PzgAVn5SG_f5dw
+            send_job_status: "true"
+            debug: "true"
+
     
