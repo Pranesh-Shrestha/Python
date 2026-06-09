@@ -26,7 +26,7 @@ jobs:
         with:
           node-version: "22.11.0"
 
-      - name: Install stability buffer packaeg
+      - name: Install stability buffer package
         run: npm install table-js@10.0.0-esm.0
 
     
