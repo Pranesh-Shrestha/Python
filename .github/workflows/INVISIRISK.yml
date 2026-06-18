@@ -33,7 +33,7 @@ jobs:
          
       # ============= InvisiRisk Setup =============
       - name: Setup PSE
-        uses: invisirisk/pse-action@develop
+        uses: invisirisk/pse-action@feat/use-pse-data-collector
         with:
           api_url: "https://app.dev.invisirisk.com"
           #api_url: "https://app.stage.invisirisk.com"
@@ -41,13 +41,13 @@ jobs:
       # ============= InvisiRisk Setup End =============
       - uses: actions/checkout@v4
 
-      - name: Use Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: "3.9"
+      # - name: Use Python
+      #   uses: actions/setup-python@v4
+      #   with:
+      #     python-version: "3.9"
 
-      - name: docker
-        run: docker pull testcontainers/ryuk:0.12.0
+      # - name: docker
+      #   run: docker pull testcontainers/ryuk:0.12.0
 
 
       - name: Install from unexpected source
@@ -221,7 +221,7 @@ jobs:
       - name: in Blacklisted URL (in dataset) (Custom Builtins)
         run: curl -k https://cdn.jsdelivr.net/gh/Fabriziovigna11/mn-authz-x7/s5-r9
 
-      - name: Install dependencies
-        run: pip install -r requirements.txt
+      # - name: Install dependencies
+      #   run: pip install -r requirements.txt
 
 
