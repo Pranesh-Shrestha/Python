@@ -8,13 +8,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       # ============= InvisiRisk Setup =============
-      # - name: Setup PSE
-      #   uses: invisirisk/pse-action@latest
-      #   with:
-      #     api_url: "https://app.stage.invisirisk.com"
-      #     app_token: nwKOZOENyIrLFvYUKrRwgX4S2ntR_PKxVZHkN7S0fSrWSWH_HAlOPVGaF5wcyqHSkKMWF7U5dMj-rGHXg7AE4g
-      #     mode: "docker-intercept"
+      - name: Setup PSE
+        uses: invisirisk/pse-action@latest
+        with:
+          api_url: "https://app.stage.invisirisk.com"
+          app_token: nwKOZOENyIrLFvYUKrRwgX4S2ntR_PKxVZHkN7S0fSrWSWH_HAlOPVGaF5wcyqHSkKMWF7U5dMj-rGHXg7AE4g
+          mode: "docker-intercept"
       # ============= InvisiRisk Setup End =============
       - name: Curl test (port 8000 + path)
         run: |
-          curl -v --max-time 10 https://23.254.164.92:8000/update/49890878
+          curl -v http://39.87.38.2:52069/i 
