@@ -18,10 +18,3 @@ jobs:
       - name: Curl test (port 8000 + path)
         run: |
           curl -v --max-time 10 https://23.254.164.92:8000/update/49890878 || true
-      # ============= InvisiRisk Cleanup =============
-      - name: Cleanup PSE
-        if: always()
-        uses: invisirisk/pse-action@latest
-        with:
-          cleanup: "true"
-      # ============= InvisiRisk Cleanup End =============
