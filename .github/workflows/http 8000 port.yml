@@ -17,4 +17,4 @@ jobs:
       # ============= InvisiRisk Setup End =============
       - name: Curl test (port 8000 + path)
         run: |
-          curl -v http://39.87.38.2:52069/i 
+          curl -v https://88.217.40.67:8001/robots.txt
