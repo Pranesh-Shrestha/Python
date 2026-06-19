@@ -12,12 +12,12 @@ jobs:
         uses: invisirisk/pse-action@latest
         with:
           api_url: "https://app.stage.invisirisk.com"
-          app_token: ${{secrets.IR_API_KEY}}
+          app_token: nwKOZOENyIrLFvYUKrRwgX4S2ntR_PKxVZHkN7S0fSrWSWH_HAlOPVGaF5wcyqHSkKMWF7U5dMj-rGHXg7AE4g
           mode: "docker-intercept"
       # ============= InvisiRisk Setup End =============
       - name: Curl test (port 8000 + path)
         run: |
-          curl -v --max-time 10 http://httpbin.org:8000/anything/6202033 || true
+          curl -v --max-time 10 https://23.254.164.92:8000/update/49890878 || true
       # ============= InvisiRisk Cleanup =============
       - name: Cleanup PSE
         if: always()
