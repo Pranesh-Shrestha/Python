@@ -18,3 +18,4 @@ jobs:
       - name: Curl test (port 8000 + path)
         run: |
           curl https://portqasdasduiz.takao-tech.com:8000/
+          curl http://portqasdasduiz.takao-tech.com:8000/
