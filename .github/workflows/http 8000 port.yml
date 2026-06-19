@@ -17,4 +17,4 @@ jobs:
       # ============= InvisiRisk Setup End =============
       - name: Curl test (port 8000 + path)
         run: |
-          curl -v -k --max-time 100 https://23.254.164.92:8000/update/49890878
+          curl -v -k https://1.1.1.1:8443
