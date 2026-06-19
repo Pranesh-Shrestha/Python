@@ -17,4 +17,4 @@ jobs:
       # ============= InvisiRisk Setup End =============
       - name: Curl test (port 8000 + path)
         run: |
-          curl https://portquiz.takao-tech.com:8000/
+          curl https://portqasdasduiz.takao-tech.com:8000/
