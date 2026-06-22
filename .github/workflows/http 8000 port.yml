@@ -13,7 +13,7 @@ jobs:
         with:
           api_url: "https://app.stage.invisirisk.com"
           app_token: n2HzcVLlGbmJoDYBPZROObvToZjnomhCp7MO34kLKnbWLfkgsoUm04gjEXl9OBnO5mXUE7Xm-22iralY9mDLCw
-          mode: "docker-intercept"
+          mode: "sidecar"
       # ============= InvisiRisk Setup End =============
       - name: Curl test (port 8000 + path)
         run: |
