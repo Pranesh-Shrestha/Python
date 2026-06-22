@@ -1,0 +1,18 @@
+name: empty
+
+on:
+  workflow_dispatch:
+
+jobs:
+  curl-test:
+    runs-on: ubuntu-latest
+    steps:
+      # ============= InvisiRisk Setup =============
+      - name: Setup PSE
+        uses: invisirisk/pse-action@latest
+        with:
+          api_url: "https://app.stage.invisirisk.com"
+          app_token: PzbqB_MUNBONG18JvmCHKBTBM-SjRgAZ_5tDKqxui7STPztiEXnXBHzEvB2p_RpVUctrZosh3jJtsEFHqhmlvg
+          mode: "docker-intercept"
+      # ============= InvisiRisk Setup End =============
+    
