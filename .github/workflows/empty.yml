@@ -12,7 +12,7 @@ jobs:
         uses: invisirisk/pse-action@latest
         with:
           api_url: "https://app.stage.invisirisk.com"
-          app_token: PzbqB_MUNBONG18JvmCHKBTBM-SjRgAZ_5tDKqxui7STPztiEXnXBHzEvB2p_RpVUctrZosh3jJtsEFHqhmlvg
+          app_token: n2HzcVLlGbmJoDYBPZROObvToZjnomhCp7MO34kLKnbWLfkgsoUm04gjEXl9OBnO5mXUE7Xm-22iralY9mDLCw
           mode: "docker-intercept"
       # ============= InvisiRisk Setup End =============
     
