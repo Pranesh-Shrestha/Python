@@ -13,7 +13,7 @@ jobs:
         with:
           api_url: "https://app.stage.invisirisk.com"
           app_token: eOCrpmG0BPU8z4ioWFIwcvHLdnQ0Ll-GlcNuowc_A9ZtP2F8_RccXIZo4xMmYNmp8YC-VdVPDhygAToCwLRyFg
-          mode: "sidecar"
+          mode: "docker-intercept"
       # ============= InvisiRisk Setup End =============
       - name: node fetch
         run: |
