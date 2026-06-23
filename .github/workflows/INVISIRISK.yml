@@ -1,9 +1,6 @@
 name: Python application
 on:
   workflow_dispatch:
-  pull_request:
-   branches:
-      - CHART
 
 permissions:
   checks: write
@@ -33,11 +30,11 @@ jobs:
          
       # ============= InvisiRisk Setup =============
       - name: Setup PSE
-        uses: invisirisk/pse-action@develop
+        uses: invisirisk/pse-action@latest
         with:
-          api_url: "https://app.dev.invisirisk.com"
-          #api_url: "https://app.stage.invisirisk.com"
-          app_token: ${{ secrets.IR_API_KEY }}
+          #api_url: "https://app.dev.invisirisk.com"
+          api_url: "https://app.stage.invisirisk.com"
+          app_token: R_qX2MfuGnAjhTGdsOZTz5WoV09DXumLMXk9pkJatWJAHf2dnZZBOjz9f2aLPYKdqs7bTMy48_S-pYu4gSiDMw
       # ============= InvisiRisk Setup End =============
       - uses: actions/checkout@v4
 
