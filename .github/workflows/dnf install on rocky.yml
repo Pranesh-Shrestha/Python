@@ -17,7 +17,7 @@ jobs:
           mode: "native"
       # ============= InvisiRisk Setup End =============
       - name: Install curl
-        run: dnf install -y curl
+        run: dnf install -y htop
 
       - name: Test curl
-        run: curl --version
+        run: htop --version
