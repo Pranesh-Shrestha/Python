@@ -16,8 +16,10 @@ jobs:
           app_token: MiilPWhHFDfj6_7f49Q4XziQH62QcQnZNqjVJiaFFMpi_7SwqpaxZ-BTUIkR0m0-nruJb9YLrIHZ7hCCBPLq1Q
           mode: "native"
       # ============= InvisiRisk Setup End =============
-      - name: Install curl
-        run: dnf install -y htop
+      - name: Install htop
+        run: |
+          dnf install -y epel-release
+          dnf install -y htop
 
-      - name: Test curl
+      - name: Verify
         run: htop --version
