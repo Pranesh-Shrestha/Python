@@ -11,8 +11,8 @@ jobs:
       - name: Setup PSE
         uses: invisirisk/pse-action@latest
         with:
-          api_url: "https://app.stage.invisirisk.com"
-          app_token: n2HzcVLlGbmJoDYBPZROObvToZjnomhCp7MO34kLKnbWLfkgsoUm04gjEXl9OBnO5mXUE7Xm-22iralY9mDLCw
+          api_url: "https://app.invisirisk.com"
+          app_token: 4TH3Bi9TX6JXKH3so1lve52BD6JhL10Us4NS7P3Ds8fb92RkNm8bVncGDi2ZcC-x3wvAaNpfVbOH42JzyAb0Iw
           mode: "docker-intercept"
       # ============= InvisiRisk Setup End =============
     
