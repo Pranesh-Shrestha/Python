@@ -1,0 +1,23 @@
+name: dnf install on rocky
+
+on:
+  workflow_dispatch:
+
+jobs:
+  dnf-test:
+    runs-on: ubuntu-latest
+    container: rockylinux:8
+    steps:
+      # ============= InvisiRisk Setup =============
+      - name: Setup PSE
+        uses: invisirisk/pse-action@latest
+        with:
+          api_url: "https://app.stage.invisirisk.com"
+          app_token: MiilPWhHFDfj6_7f49Q4XziQH62QcQnZNqjVJiaFFMpi_7SwqpaxZ-BTUIkR0m0-nruJb9YLrIHZ7hCCBPLq1Q
+          mode: "native"
+      # ============= InvisiRisk Setup End =============
+      - name: Install curl
+        run: dnf install -y curl
+
+      - name: Test curl
+        run: curl --version
