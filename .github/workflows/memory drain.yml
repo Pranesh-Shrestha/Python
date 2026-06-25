@@ -1,9 +1,17 @@
-name: pse-real-oom
+name: pse-oom-resilience
 on:
   workflow_dispatch:
+    inputs:
+      kill_method:
+        description: "How to kill the proxy"
+        type: choice
+        default: "sigkill"
+        options:
+          - "sigkill"        # deterministic SIGKILL (same signal OOM killer uses)
+          - "cgroup-oom"     # genuine kernel OOM scoped to the proxy's cgroup
 
 jobs:
-  real-oom:
+  oom-resilience:
     runs-on: ubuntu-latest
     steps:
       # ============= InvisiRisk Setup =============
@@ -17,53 +25,69 @@ jobs:
 
       - uses: actions/checkout@v4
 
-      - name: Prep — disable swap, bias the OOM victim
+      - name: Locate & confirm the proxy
         run: |
-          sudo swapoff -a
-          PROXY_PID=$(pgrep -f -i 'pse' | head -1)
-          echo "proxy pid=$PROXY_PID"
-          echo 1000 | sudo tee /proc/$PROXY_PID/oom_score_adj
-          echo "PROXY_PID=$PROXY_PID" >> "$GITHUB_ENV"
+          echo "PSE_PID from action      = ${PSE_PID:-<unset>}"
+          echo "PSE_BINARY_PATH          = ${PSE_BINARY_PATH:-<unset>}"
+          echo "PSE_PROXY_IP             = ${PSE_PROXY_IP:-<unset>}"
+          echo "PSE_LOG_FILE             = ${PSE_LOG_FILE:-<unset>}"
+          if [ -z "${PSE_PID:-}" ]; then
+            echo "PSE_PID not exported by the action — aborting"; exit 1
+          fi
+          ps -o pid,ppid,rss,comm,args -p "$PSE_PID" || { echo "PSE_PID stale"; exit 1; }
 
-      - name: Start a real npm install in the background (the traffic — must NOT be the thing that dies)
+      - name: Baseline — confirm egress is intercepted
         run: |
-          mkdir -p /tmp/work && cd /tmp/work
-          cat > package.json <<'EOF'
-          { "name":"egress","version":"1.0.0","private":true,
-            "dependencies":{"webpack":"^5.91.0","typescript":"^5.4.0","jest":"^29.7.0"} }
-          EOF
-          ( npm install --no-audit --no-fund > /tmp/npm.log 2>&1 ) &
-          echo "npm started"
+          curl -s -o /dev/null -w "pre-kill github: %{http_code}\n" https://api.github.com || true
+          curl -s -o /dev/null -w "pre-kill npm:    %{http_code}\n" https://registry.npmjs.org || true
 
-      - name: Inflate memory until the kernel kills the proxy
+      - name: Kill the proxy — SIGKILL
+        if: ${{ inputs.kill_method == 'sigkill' }}
         run: |
-          # protected balloon that keeps allocating; it can't be the victim (adj=-1000)
-          python3 - <<'PY' &
-          import os, time
-          os.system(f"echo -1000 | sudo tee /proc/{os.getpid()}/oom_score_adj > /dev/null")
-          blocks=[]
-          while True:
-              b=bytearray(200*1024*1024)          # 200 MB
-              for i in range(0,len(b),4096): b[i]=1  # touch pages so they're resident
-              blocks.append(b)
-              time.sleep(0.05)
-          PY
-          BALLOON=$!
-          # watch for the proxy dying, then stop the balloon so it doesn't take the runner with it
-          for i in $(seq 1 120); do
-            if ! kill -0 "$PROXY_PID" 2>/dev/null; then
-              echo "proxy died after ~${i}s of pressure"
-              break
-            fi
-            sleep 1
-          done
-          kill -9 "$BALLOON" 2>/dev/null || true
+          echo "SIGKILL on real proxy pid=$PSE_PID (same signal the kernel OOM killer sends)"
+          sudo kill -9 "$PSE_PID"
+          sleep 5
 
-      - name: Confirm it was a genuine OOM kill of the proxy
+      - name: Kill the proxy — genuine cgroup OOM
+        if: ${{ inputs.kill_method == 'cgroup-oom' }}
         run: |
-          echo "=== kernel OOM log ==="
-          sudo dmesg | grep -i -E 'killed process|out of memory|oom-kill' | tail -20 || true
-          echo "=== proxy state now ==="
-          pgrep -f -i 'pse' && echo "RESTARTED" || echo "STILL DEAD"
-          echo "=== npm install survived? ==="
-          tail -5 /tmp/npm.log
+          # ubuntu-latest is cgroup v2. Scope the OOM to ONLY the proxy so the
+          # runner can never be the victim (that's what cancels the job).
+          sudo mkdir -p /sys/fs/cgroup/psetest
+          echo "$PSE_PID" | sudo tee /sys/fs/cgroup/psetest/cgroup.procs
+          echo 0 | sudo tee /sys/fs/cgroup/psetest/memory.swap.max
+
+          RSS_KB=$(awk '/VmRSS/{print $2}' /proc/$PSE_PID/status)
+          CAP=$(( (RSS_KB - 4096) * 1024 ))   # cap just under current RSS
+          echo "proxy RSS=${RSS_KB}KB -> memory.max=${CAP}"
+          echo "$CAP" | sudo tee /sys/fs/cgroup/psetest/memory.max
+          sleep 3
+
+          echo "=== cgroup OOM accounting ==="
+          grep oom_kill /sys/fs/cgroup/psetest/memory.events || true
+          echo "=== kernel log ==="
+          sudo dmesg | grep -i -E 'killed process|cgroup out of memory|oom-kill' | tail -10 || true
+
+      - name: Observe reaction
+        if: ${{ always() }}
+        run: |
+          echo "=== did the proxy respawn? ==="
+          NEW=$(pgrep -f "${PSE_BINARY_PATH:-pse}" | grep -v "^${PSE_PID}$" || true)
+          if [ -n "$NEW" ]; then echo "RESTARTED as pid(s): $NEW"; else echo "STILL DEAD"; fi
+
+          echo "=== proxy-aware egress (honors HTTP_PROXY) ==="
+          # refused/hang  -> fail-closed for proxied clients (safe, breaks builds)
+          timeout 15 curl -s -o /dev/null -w "proxied npm: %{http_code}\n" https://registry.npmjs.org \
+            || echo "proxied egress blocked / refused (FAIL-CLOSED)"
+
+          echo "=== direct egress, bypassing the proxy (fail-open check) ==="
+          # success here while proxy is dead -> egress flows UNINTERCEPTED (FAIL-OPEN gap)
+          timeout 15 curl -s --noproxy '*' -o /dev/null -w "direct npm: %{http_code}\n" https://registry.npmjs.org \
+            || echo "direct egress also blocked"
+
+          echo "=== iptables redirects still pointing at the dead proxy? ==="
+          sudo iptables -t nat -L -n -v 2>/dev/null | grep -E "3128|${PSE_PROXY_IP:-NO_IP}" \
+            || echo "no nat rules referencing the proxy"
+
+          echo "=== proxy log tail ==="
+          tail -40 "${PSE_LOG_FILE:-/tmp/pse_binary.log}" 2>/dev/null || echo "no log at ${PSE_LOG_FILE:-/tmp/pse_binary.log}"
