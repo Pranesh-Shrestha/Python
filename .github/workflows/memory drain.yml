@@ -1,8 +1,9 @@
-name: memory drain
+name: pse-real-oom
 on:
   workflow_dispatch:
+
 jobs:
-  memory-drain-test:
+  real-oom:
     runs-on: ubuntu-latest
     steps:
       # ============= InvisiRisk Setup =============
@@ -13,8 +14,56 @@ jobs:
           app_token: P9bIYN81piWxyRLubJNGv9c5Oa58SZoUyKS_TFFItNBFvHf0cxmyrENrT2vnUajwbsMswtjU6Cy_pcztRDKmKg
           mode: "docker-intercept"
       # ============= InvisiRisk Setup End =============
-      - name: Memory drain loop
+
+      - uses: actions/checkout@v4
+
+      - name: Prep — disable swap, bias the OOM victim
         run: |
-          for i in {1..1000}; do
-            curl -s -o /dev/null -w "Request $i: %{http_code}\n" https://api.example.com/endpoint
+          sudo swapoff -a
+          PROXY_PID=$(pgrep -f -i 'pse' | head -1)
+          echo "proxy pid=$PROXY_PID"
+          echo 1000 | sudo tee /proc/$PROXY_PID/oom_score_adj
+          echo "PROXY_PID=$PROXY_PID" >> "$GITHUB_ENV"
+
+      - name: Start a real npm install in the background (the traffic — must NOT be the thing that dies)
+        run: |
+          mkdir -p /tmp/work && cd /tmp/work
+          cat > package.json <<'EOF'
+          { "name":"egress","version":"1.0.0","private":true,
+            "dependencies":{"webpack":"^5.91.0","typescript":"^5.4.0","jest":"^29.7.0"} }
+          EOF
+          ( npm install --no-audit --no-fund > /tmp/npm.log 2>&1 ) &
+          echo "npm started"
+
+      - name: Inflate memory until the kernel kills the proxy
+        run: |
+          # protected balloon that keeps allocating; it can't be the victim (adj=-1000)
+          python3 - <<'PY' &
+          import os, time
+          os.system(f"echo -1000 | sudo tee /proc/{os.getpid()}/oom_score_adj > /dev/null")
+          blocks=[]
+          while True:
+              b=bytearray(200*1024*1024)          # 200 MB
+              for i in range(0,len(b),4096): b[i]=1  # touch pages so they're resident
+              blocks.append(b)
+              time.sleep(0.05)
+          PY
+          BALLOON=$!
+          # watch for the proxy dying, then stop the balloon so it doesn't take the runner with it
+          for i in $(seq 1 120); do
+            if ! kill -0 "$PROXY_PID" 2>/dev/null; then
+              echo "proxy died after ~${i}s of pressure"
+              break
+            fi
+            sleep 1
           done
+          kill -9 "$BALLOON" 2>/dev/null || true
+
+      - name: Confirm it was a genuine OOM kill of the proxy
+        run: |
+          echo "=== kernel OOM log ==="
+          sudo dmesg | grep -i -E 'killed process|out of memory|oom-kill' | tail -20 || true
+          echo "=== proxy state now ==="
+          pgrep -f -i 'pse' && echo "RESTARTED" || echo "STILL DEAD"
+          echo "=== npm install survived? ==="
+          tail -5 /tmp/npm.log
