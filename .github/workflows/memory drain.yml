@@ -1,0 +1,20 @@
+name: memory drain
+on:
+  workflow_dispatch:
+jobs:
+  memory-drain-test:
+    runs-on: ubuntu-latest
+    steps:
+      # ============= InvisiRisk Setup =============
+      - name: Setup PSE
+        uses: invisirisk/pse-action@latest
+        with:
+          api_url: "https://app.stage.invisirisk.com"
+          app_token: P9bIYN81piWxyRLubJNGv9c5Oa58SZoUyKS_TFFItNBFvHf0cxmyrENrT2vnUajwbsMswtjU6Cy_pcztRDKmKg
+          mode: "docker-intercept"
+      # ============= InvisiRisk Setup End =============
+      - name: Memory drain loop
+        run: |
+          for i in {1..1000}; do
+            curl -s -o /dev/null -w "Request $i: %{http_code}\n" https://api.example.com/endpoint
+          done
