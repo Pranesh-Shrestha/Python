@@ -17,75 +17,63 @@ jobs:
 
       - uses: actions/checkout@v4
 
-      - name: Find the proxy PID
+      - name: Profile proxy memory during npm installs
         run: |
+          set -x
+          # --- locate the proxy ---
           PID=$(sudo ss -ltnp 2>/dev/null | awk '/:3128 /{print}' | grep -oE 'pid=[0-9]+' | head -1 | cut -d= -f2)
           PID="${PID:-$PSE_PID}"
-          echo "PROFILE_PID=$PID" >> "$GITHUB_ENV"
           echo "profiling proxy pid=$PID"
-          ps -o pid,rss,args -p "$PID"
+          if ! kill -0 "$PID" 2>/dev/null; then
+            echo "ERROR: proxy pid '$PID' not alive/visible. Diagnostics:"
+            sudo ss -ltnp 2>/dev/null | grep 3128 || echo "nothing on 3128"
+            sudo ps -eo pid,rss,args | grep -F "${PSE_BINARY_PATH:-pse}" | grep -v grep || true
+            exit 1
+          fi
 
-      - name: Start RSS sampler (background)
-        run: |
+          # --- start sampler in the SAME step so it survives the install ---
           echo "elapsed_s,rss_kb" > /tmp/proxy_mem.csv
           ( start=$SECONDS
-            while kill -0 "$PROFILE_PID" 2>/dev/null; do
-              rss=$(awk '/VmRSS/{print $2}' /proc/$PROFILE_PID/status 2>/dev/null)
-              echo "$((SECONDS-start)),$rss" >> /tmp/proxy_mem.csv
+            while kill -0 "$PID" 2>/dev/null; do
+              rss=$(awk '/VmRSS/{print $2}' /proc/$PID/status 2>/dev/null)
+              echo "$((SECONDS-start)),${rss:-NA}" >> /tmp/proxy_mem.csv
               sleep 2
             done ) &
-          echo "SAMPLER_PID=$!" >> "$GITHUB_ENV"
+          SAMPLER=$!
 
-      - name: Generate a large npm install workload
-        run: |
+          # --- workload ---
           mkdir -p /tmp/work && cd /tmp/work
-          # heavy dependency tree -> hundreds of package fetches through the proxy
           cat > package.json <<'EOF'
           {
-            "name": "proxy-mem-workload",
-            "version": "1.0.0",
-            "private": true,
+            "name": "proxy-mem-workload", "version": "1.0.0", "private": true,
             "dependencies": {
-              "@angular/cli": "^17.3.0",
-              "webpack": "^5.91.0",
-              "typescript": "^5.4.0",
-              "eslint": "^8.57.0",
-              "jest": "^29.7.0",
-              "@babel/core": "^7.24.0",
-              "@babel/preset-env": "^7.24.0",
-              "react": "^18.2.0",
-              "react-dom": "^18.2.0",
-              "next": "^14.2.0",
-              "vue": "^3.4.0",
-              "express": "^4.19.0",
-              "lodash": "^4.17.21",
-              "rxjs": "^7.8.0"
+              "@angular/cli": "^17.3.0", "webpack": "^5.91.0", "typescript": "^5.4.0",
+              "eslint": "^8.57.0", "jest": "^29.7.0", "@babel/core": "^7.24.0",
+              "@babel/preset-env": "^7.24.0", "react": "^18.2.0", "react-dom": "^18.2.0",
+              "next": "^14.2.0", "vue": "^3.4.0", "express": "^4.19.0",
+              "lodash": "^4.17.21", "rxjs": "^7.8.0"
             }
           }
           EOF
+
           echo "=== install pass 1 ==="
           npm install --no-audit --no-fund 2>&1 | tail -5
-          echo "=== clean + reinstall (pass 2, more proxy traffic) ==="
+          echo "=== pass 2 (clean cache, re-fetch all through proxy) ==="
           rm -rf node_modules package-lock.json
           npm cache clean --force
           npm install --no-audit --no-fund 2>&1 | tail -5
-          sleep 4   # let the sampler capture the post-install plateau
+          sleep 4
 
-      - name: Report memory profile
-        if: ${{ always() }}
-        run: |
-          kill "$SAMPLER_PID" 2>/dev/null || true
-          echo "=== full RSS samples (elapsed_s, rss_kb) ==="
+          # --- stop sampler & report ---
+          kill "$SAMPLER" 2>/dev/null || true
+          echo "=== samples ==="
           cat /tmp/proxy_mem.csv
           echo "=== summary ==="
-          awk -F, 'NR>1{
-            if($2>max){max=$2}; if(min==""||$2<min){min=$2}; sum+=$2; n++
+          awk -F, 'NR>1 && $2!="NA"{
+            if($2>max)max=$2; if(min==""||$2<min)min=$2; sum+=$2; n++
           } END {
-            printf "samples=%d\n", n
-            printf "min   = %d KB (%.1f MB)\n", min, min/1024
-            printf "max   = %d KB (%.1f MB)\n", max, max/1024
-            printf "mean  = %d KB (%.1f MB)\n", sum/n, (sum/n)/1024
-            printf "growth= %d KB (%.1f MB)\n", max-min, (max-min)/1024
+            if(n==0){print "no samples captured"; exit}
+            printf "samples=%d\nmin=%.1f MB\nmax=%.1f MB\nmean=%.1f MB\ngrowth=%.1f MB\n", n, min/1024, max/1024, (sum/n)/1024, (max-min)/1024
           }' /tmp/proxy_mem.csv
 
       - name: Upload CSV
