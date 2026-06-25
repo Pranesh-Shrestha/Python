@@ -1,6 +1,10 @@
 name: pse-memory-profile
 on:
   workflow_dispatch:
+    inputs:
+      passes:
+        description: "Number of clean-install passes through the proxy"
+        default: "3"
 
 jobs:
   profile:
@@ -19,29 +23,32 @@ jobs:
 
       - name: Profile proxy memory during npm installs
         run: |
-          set -x
-          # --- locate the proxy ---
+          # ---- locate the proxy (owner of port 3128; runs as root) ----
           PID=$(sudo ss -ltnp 2>/dev/null | awk '/:3128 /{print}' | grep -oE 'pid=[0-9]+' | head -1 | cut -d= -f2)
           PID="${PID:-$PSE_PID}"
-          echo "profiling proxy pid=$PID"
-          if ! kill -0 "$PID" 2>/dev/null; then
-            echo "ERROR: proxy pid '$PID' not alive/visible. Diagnostics:"
+          echo "profiling Go proxy pid=$PID"
+          if ! sudo kill -0 "$PID" 2>/dev/null; then
+            echo "ERROR: proxy pid '$PID' not found"
             sudo ss -ltnp 2>/dev/null | grep 3128 || echo "nothing on 3128"
-            sudo ps -eo pid,rss,args | grep -F "${PSE_BINARY_PATH:-pse}" | grep -v grep || true
             exit 1
           fi
+          sudo awk '/VmRSS/{print "initial RSS:", $2/1024, "MB"}' /proc/$PID/status
 
-          # --- start sampler in the SAME step so it survives the install ---
-          echo "elapsed_s,rss_kb" > /tmp/proxy_mem.csv
+          # ---- background sampler: RSS + thread count (goroutine-leak tell) ----
+          # one PID covers ALL goroutines (Go multiplexes them onto threads in-process)
+          echo "elapsed_s,rss_kb,vmsize_kb,threads" > /tmp/proxy_mem.csv
           ( start=$SECONDS
-            while kill -0 "$PID" 2>/dev/null; do
-              rss=$(awk '/VmRSS/{print $2}' /proc/$PID/status 2>/dev/null)
-              echo "$((SECONDS-start)),${rss:-NA}" >> /tmp/proxy_mem.csv
+            for r in $(seq 1 600); do
+              s=$(sudo cat /proc/$PID/status 2>/dev/null) || break
+              rss=$(echo "$s" | awk '/VmRSS/{print $2}')
+              vsz=$(echo "$s" | awk '/VmSize/{print $2}')
+              thr=$(echo "$s" | awk '/Threads/{print $2}')
+              echo "$((SECONDS-start)),${rss:-NA},${vsz:-NA},${thr:-NA}" >> /tmp/proxy_mem.csv
               sleep 2
             done ) &
           SAMPLER=$!
 
-          # --- workload ---
+          # ---- workload: heavy npm dependency tree ----
           mkdir -p /tmp/work && cd /tmp/work
           cat > package.json <<'EOF'
           {
@@ -51,29 +58,40 @@ jobs:
               "eslint": "^8.57.0", "jest": "^29.7.0", "@babel/core": "^7.24.0",
               "@babel/preset-env": "^7.24.0", "react": "^18.2.0", "react-dom": "^18.2.0",
               "next": "^14.2.0", "vue": "^3.4.0", "express": "^4.19.0",
-              "lodash": "^4.17.21", "rxjs": "^7.8.0"
+              "lodash": "^4.17.21", "rxjs": "^7.8.0", "@nestjs/core": "^10.3.0",
+              "gatsby": "^5.13.0", "@mui/material": "^5.15.0"
             }
           }
           EOF
 
-          echo "=== install pass 1 ==="
-          npm install --no-audit --no-fund 2>&1 | tail -5
-          echo "=== pass 2 (clean cache, re-fetch all through proxy) ==="
-          rm -rf node_modules package-lock.json
-          npm cache clean --force
-          npm install --no-audit --no-fund 2>&1 | tail -5
+          PASSES="${{ inputs.passes }}"
+          for p in $(seq 1 "${PASSES:-3}"); do
+            echo "=== install pass $p / ${PASSES:-3} ==="
+            rm -rf node_modules package-lock.json
+            npm cache clean --force >/dev/null 2>&1 || true
+            npm install --no-audit --no-fund 2>&1 | tail -3
+            # mark RSS at end of each pass
+            sudo awk -v p="$p" '/VmRSS/{print "  pass "p" end RSS:", $2/1024, "MB"}' /proc/$PID/status
+          done
           sleep 4
 
-          # --- stop sampler & report ---
+          # ---- stop sampler (our own bg loop, NOT the proxy) & report ----
           kill "$SAMPLER" 2>/dev/null || true
-          echo "=== samples ==="
+          echo "=== raw samples ==="
           cat /tmp/proxy_mem.csv
           echo "=== summary ==="
           awk -F, 'NR>1 && $2!="NA"{
-            if($2>max)max=$2; if(min==""||$2<min)min=$2; sum+=$2; n++
+            if($2>maxr)maxr=$2; if(minr==""||$2<minr)minr=$2; sumr+=$2; n++
+            if($4>maxt)maxt=$4; if(mint==""||$4<mint)mint=$4
           } END {
             if(n==0){print "no samples captured"; exit}
-            printf "samples=%d\nmin=%.1f MB\nmax=%.1f MB\nmean=%.1f MB\ngrowth=%.1f MB\n", n, min/1024, max/1024, (sum/n)/1024, (max-min)/1024
+            printf "samples      = %d\n", n
+            printf "RSS min      = %.1f MB\n", minr/1024
+            printf "RSS max      = %.1f MB   <- peak the OS backed (use for OOM sizing)\n", maxr/1024
+            printf "RSS mean     = %.1f MB\n", (sumr/n)/1024
+            printf "RSS growth   = %.1f MB   <- if large & rising across passes => leak\n", (maxr-minr)/1024
+            printf "threads min  = %d\n", mint
+            printf "threads max  = %d   <- climbing threads + climbing RSS => goroutine leak\n", maxt
           }' /tmp/proxy_mem.csv
 
       - name: Upload CSV
