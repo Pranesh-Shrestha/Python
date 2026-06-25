@@ -1,4 +1,4 @@
-name: pse-memory-profile
+name: pse-memory-profile-5k
 on:
   workflow_dispatch:
     inputs:
@@ -21,7 +21,7 @@ jobs:
 
       - uses: actions/checkout@v4
 
-      - name: Profile proxy memory during npm installs
+      - name: Profile proxy memory during npm installs (~5000 pkgs)
         run: |
           # ---- locate the proxy (owner of port 3128; runs as root) ----
           PID=$(sudo ss -ltnp 2>/dev/null | awk '/:3128 /{print}' | grep -oE 'pid=[0-9]+' | head -1 | cut -d= -f2)
@@ -34,32 +34,65 @@ jobs:
           fi
           sudo awk '/VmRSS/{print "initial RSS:", $2/1024, "MB"}' /proc/$PID/status
 
-          # ---- background sampler: RSS + thread count (goroutine-leak tell) ----
-          # one PID covers ALL goroutines (Go multiplexes them onto threads in-process)
+          # ---- background sampler: RSS + thread count, every 1s ----
           echo "elapsed_s,rss_kb,vmsize_kb,threads" > /tmp/proxy_mem.csv
           ( start=$SECONDS
-            for r in $(seq 1 600); do
+            for r in $(seq 1 1200); do
               s=$(sudo cat /proc/$PID/status 2>/dev/null) || break
               rss=$(echo "$s" | awk '/VmRSS/{print $2}')
               vsz=$(echo "$s" | awk '/VmSize/{print $2}')
               thr=$(echo "$s" | awk '/Threads/{print $2}')
               echo "$((SECONDS-start)),${rss:-NA},${vsz:-NA},${thr:-NA}" >> /tmp/proxy_mem.csv
-              sleep 2
+              sleep 1
             done ) &
           SAMPLER=$!
 
-          # ---- workload: heavy npm dependency tree ----
+          # ---- workload: large dependency tree (~5000 transitive packages) ----
           mkdir -p /tmp/work && cd /tmp/work
           cat > package.json <<'EOF'
           {
-            "name": "proxy-mem-workload", "version": "1.0.0", "private": true,
+            "name": "proxy-mem-workload-5k", "version": "1.0.0", "private": true,
             "dependencies": {
-              "@angular/cli": "^17.3.0", "webpack": "^5.91.0", "typescript": "^5.4.0",
-              "eslint": "^8.57.0", "jest": "^29.7.0", "@babel/core": "^7.24.0",
-              "@babel/preset-env": "^7.24.0", "react": "^18.2.0", "react-dom": "^18.2.0",
-              "next": "^14.2.0", "vue": "^3.4.0", "express": "^4.19.0",
-              "lodash": "^4.17.21", "rxjs": "^7.8.0", "@nestjs/core": "^10.3.0",
-              "gatsby": "^5.13.0", "@mui/material": "^5.15.0"
+              "@angular/cli": "^17.3.0",
+              "@nestjs/core": "^10.3.0",
+              "@nestjs/common": "^10.3.0",
+              "@nestjs/platform-express": "^10.3.0",
+              "gatsby": "^5.13.0",
+              "next": "^14.2.0",
+              "nuxt": "^3.11.0",
+              "@vue/cli-service": "^5.0.8",
+              "react-scripts": "^5.0.1",
+              "@storybook/react": "^7.6.0",
+              "@storybook/addon-essentials": "^7.6.0",
+              "webpack": "^5.91.0",
+              "vite": "^5.2.0",
+              "rollup": "^4.13.0",
+              "parcel": "^2.12.0",
+              "typescript": "^5.4.0",
+              "eslint": "^8.57.0",
+              "prettier": "^3.2.0",
+              "jest": "^29.7.0",
+              "cypress": "^13.7.0",
+              "@playwright/test": "^1.42.0",
+              "@babel/core": "^7.24.0",
+              "@babel/preset-env": "^7.24.0",
+              "@babel/preset-react": "^7.24.0",
+              "@babel/preset-typescript": "^7.24.0",
+              "@mui/material": "^5.15.0",
+              "@mui/icons-material": "^5.15.0",
+              "antd": "^5.15.0",
+              "react": "^18.2.0",
+              "react-dom": "^18.2.0",
+              "vue": "^3.4.0",
+              "@angular/core": "^17.3.0",
+              "@angular/common": "^17.3.0",
+              "@angular/compiler-cli": "^17.3.0",
+              "express": "^4.19.0",
+              "lodash": "^4.17.21",
+              "rxjs": "^7.8.0",
+              "graphql": "^16.8.0",
+              "apollo-server": "^3.13.0",
+              "@apollo/client": "^3.9.0"
             }
           }
           EOF
@@ -69,13 +102,14 @@ jobs:
             echo "=== install pass $p / ${PASSES:-3} ==="
             rm -rf node_modules package-lock.json
             npm cache clean --force >/dev/null 2>&1 || true
-            npm install --no-audit --no-fund 2>&1 | tail -3
-            # mark RSS at end of each pass
-            sudo awk -v p="$p" '/VmRSS/{print "  pass "p" end RSS:", $2/1024, "MB"}' /proc/$PID/status
+            # --legacy-peer-deps avoids hard failures on the many cross-framework peer conflicts
+            npm install --no-audit --no-fund --legacy-peer-deps 2>&1 | tail -3
+            COUNT=$(find node_modules -name package.json 2>/dev/null | wc -l)
+            sudo awk -v p="$p" -v c="$COUNT" '/VmRSS/{print "  pass "p" end RSS:", $2/1024, "MB  | packages:", c}' /proc/$PID/status
           done
           sleep 4
 
-          # ---- stop sampler (our own bg loop, NOT the proxy) & report ----
+          # ---- stop sampler (our bg loop, NOT the proxy) & report ----
           kill "$SAMPLER" 2>/dev/null || true
           echo "=== raw samples ==="
           cat /tmp/proxy_mem.csv
@@ -87,16 +121,16 @@ jobs:
             if(n==0){print "no samples captured"; exit}
             printf "samples      = %d\n", n
             printf "RSS min      = %.1f MB\n", minr/1024
-            printf "RSS max      = %.1f MB   <- peak the OS backed (use for OOM sizing)\n", maxr/1024
+            printf "RSS max      = %.1f MB   <- peak; size the runner above this\n", maxr/1024
             printf "RSS mean     = %.1f MB\n", (sumr/n)/1024
-            printf "RSS growth   = %.1f MB   <- if large & rising across passes => leak\n", (maxr-minr)/1024
+            printf "RSS growth   = %.1f MB   <- compare to per-pass end values, not just this\n", (maxr-minr)/1024
             printf "threads min  = %d\n", mint
-            printf "threads max  = %d   <- climbing threads + climbing RSS => goroutine leak\n", maxt
+            printf "threads max  = %d   <- climbing threads + RSS across passes => goroutine leak\n", maxt
           }' /tmp/proxy_mem.csv
 
       - name: Upload CSV
         if: ${{ always() }}
         uses: actions/upload-artifact@v4
         with:
-          name: proxy-mem-profile
+          name: proxy-mem-profile-5k
           path: /tmp/proxy_mem.csv
