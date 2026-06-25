@@ -80,26 +80,24 @@ jobs:
       - name: Kill the proxy — genuine cgroup OOM
         if: ${{ inputs.kill_method == 'cgroup-oom' }}
         run: |
-          if [ -n "$PROXY_CTR" ]; then
-            # Container case: shrink its memory cgroup below current usage -> kernel OOM-kills it.
-            USED=$(docker inspect -f '{{.State.Pid}}' "$PROXY_CTR")
-            echo "proxy is containerized ($PROXY_CTR); applying a tight memory limit via docker update"
+          if [ -n "${PROXY_CTR:-}" ] && docker inspect "$PROXY_CTR" >/dev/null 2>&1; then
+            echo "containerized proxy $PROXY_CTR — forcing OOM via tight limit"
             docker update --memory=16m --memory-swap=16m "$PROXY_CTR" || true
             sleep 3
             docker inspect -f 'oom_killed={{.State.OOMKilled}} running={{.State.Running}}' "$PROXY_CTR"
           else
-            # Host process case: cgroup v2, scoped to ONLY the proxy so the runner is never the victim.
+            echo "host-process proxy pid=$TARGET_PID — cgroup v2 OOM scoped to it only"
             sudo mkdir -p /sys/fs/cgroup/psetest
             echo "$TARGET_PID" | sudo tee /sys/fs/cgroup/psetest/cgroup.procs
             echo 0 | sudo tee /sys/fs/cgroup/psetest/memory.swap.max
             RSS_KB=$(awk '/VmRSS/{print $2}' /proc/$TARGET_PID/status)
-            CAP=$(( (RSS_KB - 4096) * 1024 ))
-            echo "proxy RSS=${RSS_KB}KB -> memory.max=${CAP}"
+            # cap at HALF of current RSS so the kernel cannot satisfy it -> OOM kill
+            CAP=$(( (RSS_KB / 2) * 1024 ))
+            echo "proxy RSS=${RSS_KB}KB -> memory.max=${CAP} (half of RSS, forces kill)"
             echo "$CAP" | sudo tee /sys/fs/cgroup/psetest/memory.max
             sleep 3
             echo "=== cgroup OOM accounting ==="
-            grep oom_kill /sys/fs/cgroup/psetest/memory.events || true
-            echo "=== kernel log ==="
+            cat /sys/fs/cgroup/psetest/memory.events
             sudo dmesg | grep -i -E 'killed process|cgroup out of memory|oom-kill' | tail -10 || true
           fi
 
