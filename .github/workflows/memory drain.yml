@@ -34,15 +34,27 @@ jobs:
           fi
           sudo awk '/VmRSS/{print "initial RSS:", $2/1024, "MB"}' /proc/$PID/status
 
-          # ---- background sampler: RSS + thread count, every 1s ----
-          echo "elapsed_s,rss_kb,vmsize_kb,threads" > /tmp/proxy_mem.csv
+          # helper: sum RSS (KB) over all processes whose comm matches a regex
+          # uses ps so it covers the whole tree (npm + all node children), not one PID
+          echo "PROXY_PID=$PID" > /tmp/profenv
+
+          # ---- background sampler: proxy + npm-tree + node-tree + system mem, every 1s ----
+          echo "elapsed_s,proxy_rss_kb,proxy_threads,npm_rss_kb,node_rss_kb,mem_total_kb,mem_available_kb,mem_used_kb" > /tmp/proxy_mem.csv
           ( start=$SECONDS
             for r in $(seq 1 1200); do
-              s=$(sudo cat /proc/$PID/status 2>/dev/null) || break
-              rss=$(echo "$s" | awk '/VmRSS/{print $2}')
-              vsz=$(echo "$s" | awk '/VmSize/{print $2}')
-              thr=$(echo "$s" | awk '/Threads/{print $2}')
-              echo "$((SECONDS-start)),${rss:-NA},${vsz:-NA},${thr:-NA}" >> /tmp/proxy_mem.csv
+              # proxy: single PID (Go = one process, all goroutines inside it)
+              ps=$(sudo cat /proc/$PID/status 2>/dev/null)
+              prss=$(echo "$ps" | awk '/VmRSS/{print $2}')
+              pthr=$(echo "$ps" | awk '/Threads/{print $2}')
+              # npm + node: sum RSS across every matching process (the install tree)
+              npm_rss=$(ps -eo rss,comm 2>/dev/null  | awk '$2=="npm"{s+=$1} END{print s+0}')
+              node_rss=$(ps -eo rss,comm 2>/dev/null | awk '$2=="node"{s+=$1} END{print s+0}')
+              # system-wide memory from /proc/meminfo
+              mi=$(cat /proc/meminfo)
+              mtot=$(echo "$mi" | awk '/^MemTotal:/{print $2}')
+              mav=$(echo "$mi"  | awk '/^MemAvailable:/{print $2}')
+              mused=$(( mtot - mav ))
+              echo "$((SECONDS-start)),${prss:-NA},${pthr:-NA},${npm_rss:-0},${node_rss:-0},${mtot},${mav},${mused}" >> /tmp/proxy_mem.csv
               sleep 1
             done ) &
           SAMPLER=$!
@@ -96,36 +108,43 @@ jobs:
             }
           }
           EOF
-
           PASSES="${{ inputs.passes }}"
           for p in $(seq 1 "${PASSES:-3}"); do
             echo "=== install pass $p / ${PASSES:-3} ==="
             rm -rf node_modules package-lock.json
             npm cache clean --force >/dev/null 2>&1 || true
-            # --legacy-peer-deps avoids hard failures on the many cross-framework peer conflicts
             npm install --no-audit --no-fund --legacy-peer-deps 2>&1 | tail -3
             COUNT=$(find node_modules -name package.json 2>/dev/null | wc -l)
-            sudo awk -v p="$p" -v c="$COUNT" '/VmRSS/{print "  pass "p" end RSS:", $2/1024, "MB  | packages:", c}' /proc/$PID/status
+            sudo awk -v p="$p" -v c="$COUNT" '/VmRSS/{print "  pass "p" end proxy RSS:", $2/1024, "MB  | packages:", c}' /proc/$PID/status
           done
           sleep 4
 
-          # ---- stop sampler (our bg loop, NOT the proxy) & report ----
+          # ---- stop sampler & report ----
           kill "$SAMPLER" 2>/dev/null || true
           echo "=== raw samples ==="
           cat /tmp/proxy_mem.csv
-          echo "=== summary ==="
+          echo "=== summary (all MB) ==="
           awk -F, 'NR>1 && $2!="NA"{
-            if($2>maxr)maxr=$2; if(minr==""||$2<minr)minr=$2; sumr+=$2; n++
-            if($4>maxt)maxt=$4; if(mint==""||$4<mint)mint=$4
+            n++
+            if($2>pmax)pmax=$2;                      # proxy peak
+            if($3>tmax)tmax=$3;                      # proxy threads peak
+            if($4>npmax)npmax=$4;                    # npm tree peak
+            if($5>ndmax)ndmax=$5;                    # node tree peak
+            if($8>umax)umax=$8;                      # system used peak
+            if(amin==""||$7<amin)amin=$7;            # min available
+            mtot=$6
           } END {
-            if(n==0){print "no samples captured"; exit}
-            printf "samples      = %d\n", n
-            printf "RSS min      = %.1f MB\n", minr/1024
-            printf "RSS max      = %.1f MB   <- peak; size the runner above this\n", maxr/1024
-            printf "RSS mean     = %.1f MB\n", (sumr/n)/1024
-            printf "RSS growth   = %.1f MB   <- compare to per-pass end values, not just this\n", (maxr-minr)/1024
-            printf "threads min  = %d\n", mint
-            printf "threads max  = %d   <- climbing threads + RSS across passes => goroutine leak\n", maxt
+            if(n==0){print "no samples"; exit}
+            printf "samples            = %d\n", n
+            printf "PROXY (Go) RSS max = %.1f MB\n", pmax/1024
+            printf "  proxy threads max= %d\n", tmax
+            printf "npm tree RSS max   = %.1f MB\n", npmax/1024
+            printf "node tree RSS max  = %.1f MB\n", ndmax/1024
+            printf "----\n"
+            printf "system total       = %.1f MB\n", mtot/1024
+            printf "system USED max    = %.1f MB   <- peak whole-VM memory in use\n", umax/1024
+            printf "system AVAIL min   = %.1f MB   <- closest the VM got to OOM\n", amin/1024
+            printf "headroom at worst  = %.1f MB   <- avail min; if near 0 => OOM risk\n", amin/1024
           }' /tmp/proxy_mem.csv
 
       - name: Upload CSV
