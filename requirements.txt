@@ -7,3 +7,5 @@ openinference-semantic-conventions==0.1.30
 openinference-instrumentation-openai==0.1.52
 openinference-instrumentation-openai-agents==1.6.1
 openinference-instrumentation-langchain==0.1.66
+dynamicfeed-verify==1.0.1
+openinference-instrumentation==0.1.54
