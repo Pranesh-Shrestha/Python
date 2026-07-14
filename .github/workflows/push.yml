@@ -46,13 +46,13 @@ jobs:
           git tag -a "${{ github.event.inputs.version }}" -m "Release ${{ github.event.inputs.version }}"
           git push origin "${{ github.event.inputs.version }}"
       # REST write -> POST api.github.com/repos/{owner}/{repo}/releases   (in-scope)
-      # - name: "[ALLOW] Create release in own repo"
-      #   env:
-      #     GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      #   run: |
-      #     gh release create "${{ github.event.inputs.version }}" \
-      #       --title "Release ${{ github.event.inputs.version }}" \
-      #       --notes "Automated release"
+      - name: "[ALLOW] Create release in own repo"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release create "${{ github.event.inputs.version }}" \
+            --title "Release ${{ github.event.inputs.version }}" \
+            --notes "Automated release"
   # ═════════════════════════════════════════════════════════─
   #  MALICIOUS PATTERN — out-of-scope writes to a NEW repo
   #  Expected result: BLOCKED   (Shai-Hulud / s1ngularity behavior)
