@@ -1,0 +1,78 @@
+name: Release Patterns (BAF test)
+
+# Two common triggers:
+#  - push a tag like v1.2.3  -> release jobs run automatically
+#  - manual run              -> for on-demand testing
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Tag to create (e.g. v1.2.3)"
+        required: true
+        default: "v0.1.0"
+
+permissions:
+  contents: write   # needed to push tags and create releases
+
+jobs:
+  # ── Variant 1: Push a git tag ─────────────────────────────
+  # git PUSH -> POST .../<repo>.git/git-receive-pack
+  push-tag:
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Configure git identity
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+      - name: Create and push tag
+        run: |
+          git tag -a "${{ github.event.inputs.version }}" -m "Release ${{ github.event.inputs.version }}"
+          git push origin "${{ github.event.inputs.version }}"
+
+  # ── Variant 2: Create a Release with the gh CLI ───────────
+  # REST write -> POST api.github.com/repos/{owner}/{repo}/releases
+  release-gh-cli:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Create release (gh CLI)
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release create "${{ github.ref_name }}" \
+            --title "Release ${{ github.ref_name }}" \
+            --notes "Automated release"
+
+  # ── Variant 3: Create a Release with the standard action ──
+  # REST write -> POST api.github.com/repos/{owner}/{repo}/releases
+  release-action:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Create release (softprops action)
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: "Release ${{ github.ref_name }}"
+          generate_release_notes: true
+
+  # ── Variant 4: Release + upload a build artifact ──────────
+  # REST write -> POST release, then POST upload asset to that release
+  release-with-asset:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build artifact
+        run: echo "hello" > app.txt
+      - name: Create release and upload asset
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          files: app.txt
