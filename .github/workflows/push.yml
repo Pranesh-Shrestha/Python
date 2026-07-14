@@ -14,16 +14,24 @@ on:
         default: "baf-test-repo"
 
 permissions:
+  checks: write
+  actions: read
   contents: write   # lets the built-in GITHUB_TOKEN push tags / create releases in THIS repo
 
 jobs:
   # ══════════════════════════════════════════════════════════
   #  LEGITIMATE — in-scope writes to the build's OWN repo
   #  Expected result: ALLOWED
-  # ══════════════════════════════════════════════════════════
+  # ═════════════════════════════════════════════════════════─
   allow-tag-and-release:
     runs-on: ubuntu-latest
     steps:
+      # ============= InvisiRisk Setup =============
+      - name: Setup PSE
+        uses: invisirisk/pse-action@latest
+        with:
+          app_token: ${{secrets.IR_TOKEN}}
+      # ============= InvisiRisk Setup End =============
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
@@ -32,13 +40,11 @@ jobs:
         run: |
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-
       # git PUSH -> POST .../<repo>.git/git-receive-pack   (in-scope)
       - name: "[ALLOW] Push git tag"
         run: |
           git tag -a "${{ github.event.inputs.version }}" -m "Release ${{ github.event.inputs.version }}"
           git push origin "${{ github.event.inputs.version }}"
-
       # REST write -> POST api.github.com/repos/{owner}/{repo}/releases   (in-scope)
       - name: "[ALLOW] Create release in own repo"
         env:
@@ -47,15 +53,20 @@ jobs:
           gh release create "${{ github.event.inputs.version }}" \
             --title "Release ${{ github.event.inputs.version }}" \
             --notes "Automated release"
-
-  # ══════════════════════════════════════════════════════════
+  # ═════════════════════════════════════════════════════════─
   #  MALICIOUS PATTERN — out-of-scope writes to a NEW repo
   #  Expected result: BLOCKED   (Shai-Hulud / s1ngularity behavior)
   #  Requires a PAT with 'repo' scope stored as secret GH_PAT.
-  # ══════════════════════════════════════════════════════════
+  # ═════════════════════════════════════════════════════════─
   block-create-repo-and-plant:
     runs-on: ubuntu-latest
     steps:
+      # ============= InvisiRisk Setup =============
+      - name: Setup PSE
+        uses: invisirisk/pse-action@latest
+        with:
+          app_token: ${{secrets.IR_TOKEN}}
+      # ============= InvisiRisk Setup End =============
       # REST write -> POST api.github.com/user/repos   (out-of-scope)
       - name: "[BLOCK] Create a brand-new repo"
         env:
@@ -64,7 +75,6 @@ jobs:
           gh api --method POST /user/repos \
             -f name="${{ github.event.inputs.new_repo_name }}" \
             -F private=false
-
       # REST write -> PUT api.github.com/repos/{owner}/{repo}/contents/{path}
       # (same endpoint Shai-Hulud used to plant discussion.yaml)   (out-of-scope)
       - name: "[BLOCK] Plant a file in the new repo"
