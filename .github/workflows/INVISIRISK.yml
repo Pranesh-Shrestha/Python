@@ -41,7 +41,7 @@ jobs:
       - name: Use Python
         uses: actions/setup-python@v4
         with:
-          python-version: "3.9"
+          python-version: "3.12"
 
       - name: docker
         run: docker pull testcontainers/ryuk:0.12.0
