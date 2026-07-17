@@ -1,4 +1,4 @@
-openinference-instrumentation-google-genai==1.2.0
+openinference-instrumentation-google-genai
 openinference-instrumentation-bedrock==0.1.43
 openinference-instrumentation-claude-agent-sdk==0.1.7
 openinference-instrumentation-instructor==0.1.18
