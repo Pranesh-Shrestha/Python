@@ -33,8 +33,8 @@ jobs:
         uses: invisirisk/pse-action@latest
         with:
           #api_url: "https://app.invisirisk.com"
-          api_url: "https://app.stage.invisirisk.com"
-          app_token: NbwgIwuV4VpNkNXfRj0CUZtnkp-2dKkbB5sIHaF6sAjs480oire8OuIqzxmolVvCAdr-CHvTy4gblN5xx7U0ZQ
+          api_url: "https://app.dev.invisirisk.com"
+          app_token: j-mXpleUIUBnMiQWbYrs2UEl392jlevwM3duqcM-WRaHuIKdGJHgHWpkSuW-3Sgq8U2y1Iz30vc7FQMsEsVqIQ
       # ============= InvisiRisk Setup End =============
       - uses: actions/checkout@v4
 
