@@ -28,12 +28,7 @@ jobs:
       # - name: Verify Git Version
       #   run: git --version
 
-      # Setup PSE
-      - name: Setup PSE
-        uses: invisirisk/pse-action@latest
-        with:
-          api_url: "https://app.invisirisk.com"
-          app_token: O3FG-5Qgien5LnJ1nO8QxVKl3u2VugXgXFjboQMYdtCgTrq3HDHilrmOf6JkaVElMEJG1btLHH2NqTeU9ScOww
+
          
       - uses: actions/checkout@v4
 
