@@ -1,4 +1,4 @@
-name: Automation No Policy Applied
+name: Automation
 
 on:
   workflow_dispatch:
