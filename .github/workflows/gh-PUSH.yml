@@ -220,9 +220,7 @@ jobs:
 
       - name: mime type for policy detection
         if: always()
-        run: |
-            curl -sI -H "Accept: application/vnd.pypi.simple.v1+json" \
-            https://pypi.org/simple/requests/
-            # -> application/vnd.pypi.simple.v1+json
+        run: curl -sI https://img.shields.io/badge/test-passing-green.svg
+        # image/svg+xml
 
  
