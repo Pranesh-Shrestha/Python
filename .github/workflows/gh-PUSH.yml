@@ -215,6 +215,7 @@ jobs:
 
 
       - name: Content length download (Reponse Content Length Policy)
+        if: always()
         run: curl  -o 1GB.bin "https://nbg1-speed.hetzner.com/1GB.bin"
 
  
