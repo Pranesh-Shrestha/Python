@@ -220,7 +220,7 @@ jobs:
 
       - name: mime type for policy detection
         if: always()
-        run: curl -sI https://img.shields.io/badge/test-passing-green.svg
+        run: curl -sI https://user-images.githubusercontent.com/6633808/160689302-3fe5e5d4-ba24-4525-8ed1-a8351ccbc0ef.png
         # image/svg+xml
 
  
