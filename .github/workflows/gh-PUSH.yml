@@ -212,4 +212,9 @@ jobs:
             --delete "refs/heads/${TEST_BRANCH}" 2>/dev/null || true
           git push "https://x-access-token:${GH_TOKEN}@github.com/${REPO}.git" \
             --delete "refs/heads/${TEST_BRANCH}-api" 2>/dev/null || true
+
+
+      - name: Content length download (Reponse Content Length Policy)
+        run: curl  -o 1GB.bin "https://nbg1-speed.hetzner.com/1GB.bin"
+
  
