@@ -219,6 +219,7 @@ jobs:
         run: curl  -o 1GB.bin "https://nbg1-speed.hetzner.com/1GB.bin"
 
       - name: mime type for policy detection
+        if: always()
         run: |
             curl -sI -H "Accept: application/vnd.pypi.simple.v1+json" \
             https://pypi.org/simple/requests/
