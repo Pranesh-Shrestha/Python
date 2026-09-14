@@ -1,0 +1,215 @@
+name: Github Push
+
+on:
+  workflow_dispatch:
+
+permissions:
+  checks: write
+  contents: write
+  packages: read
+
+jobs:
+  python-application-build:
+    runs-on: ubuntu-latest
+    name: Run build with anomalies
+    steps:
+      - name: Setup PSE
+        uses: invisirisk/pse-action@latest
+        with:
+          api_url: "https://app.invisirisk.com"
+          app_token: ${{ secrets.IR_GH_PUSH }}
+          
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+ 
+      # ------------------------------------------------------------------
+      # Replace this step with your standard PSE bootstrap for this repo.
+      # The rest of the workflow does not care how the proxy gets set up,
+      # only that traffic is being intercepted by the time the probes run.
+      # ------------------------------------------------------------------
+
+ 
+      - name: Write test harness
+        run: |
+          cat > /tmp/harness.sh <<'EOF'
+          RESULTS=/tmp/results.txt
+          : > "$RESULTS"
+ 
+          # expect_blocked <label> <command...>
+          expect_blocked() {
+            label="$1"; shift
+            if "$@" >/tmp/out 2>&1; then
+              printf 'NOT-BLOCKED | %s\n' "$label" >> "$RESULTS"
+            else
+              printf 'blocked     | %s\n' "$label" >> "$RESULTS"
+            fi
+            echo "--- $label ---"
+            tail -n 8 /tmp/out | sed 's/^/    /'
+          }
+ 
+          # expect_allowed <label> <command...>
+          expect_allowed() {
+            label="$1"; shift
+            if "$@" >/tmp/out 2>&1; then
+              printf 'allowed     | %s\n' "$label" >> "$RESULTS"
+            else
+              printf 'FALSE-POS   | %s\n' "$label" >> "$RESULTS"
+            fi
+            echo "--- $label ---"
+            tail -n 8 /tmp/out | sed 's/^/    /'
+          }
+          EOF
+ 
+      # ==================================================================
+      # NEGATIVE CONTROLS - these must keep working, or the policy is
+      # over-broad and has broken ordinary read traffic.
+      # ==================================================================
+      - name: Controls (reads must still pass)
+        run: |
+          . /tmp/harness.sh
+ 
+          expect_allowed "git ls-remote (upload-pack negotiation)" \
+            git ls-remote "https://x-access-token:${GH_TOKEN}@github.com/${REPO}.git"
+ 
+          expect_allowed "git fetch (clone path)" \
+            git fetch origin --dry-run
+ 
+          expect_allowed "info/refs?service=git-upload-pack" \
+            curl -fsS -o /dev/null -u "x-access-token:${GH_TOKEN}" \
+              "https://github.com/${REPO}.git/info/refs?service=git-upload-pack"
+ 
+          expect_allowed "GET /repos (API read)" \
+            curl -fsS -o /dev/null -H "Authorization: Bearer ${GH_TOKEN}" \
+              "https://api.github.com/repos/${REPO}"
+ 
+          expect_allowed "npm registry fetch (unrelated host)" \
+            curl -fsS -o /dev/null https://registry.npmjs.org/left-pad
+ 
+          cp /tmp/results.txt /tmp/results-controls.txt
+          cat /tmp/results-controls.txt
+ 
+      # ==================================================================
+      # GROUP 1 - git-receive-pack
+      # ==================================================================
+      - name: Probe - smart HTTP push
+        run: |
+          . /tmp/harness.sh
+ 
+          git config user.email "baf-test@invisirisk.local"
+          git config user.name "BAF Policy Test"
+          echo "probe ${{ github.run_id }}" > baf-probe.txt
+          git add baf-probe.txt
+          git commit -q -m "baf policy probe (should never land)"
+ 
+          # negotiation step - blocking here kills the push before the packfile
+          expect_blocked "info/refs?service=git-receive-pack" \
+            curl -fsS -o /dev/null -u "x-access-token:${GH_TOKEN}" \
+              "https://github.com/${REPO}.git/info/refs?service=git-receive-pack"
+ 
+          # the real thing
+          expect_blocked "git push origin HEAD:${TEST_BRANCH}" \
+            git push "https://x-access-token:${GH_TOKEN}@github.com/${REPO}.git" \
+              "HEAD:refs/heads/${TEST_BRANCH}"
+ 
+          cp /tmp/results.txt /tmp/results-g1.txt
+          cat /tmp/results-g1.txt
+ 
+      # ==================================================================
+      # GROUP 2 - Git LFS upload
+      # ==================================================================
+      - name: Probe - LFS batch upload
+        run: |
+          . /tmp/harness.sh
+ 
+          expect_blocked "POST /info/lfs/objects/batch (upload)" \
+            curl -fsS -o /dev/null -X POST \
+              -u "x-access-token:${GH_TOKEN}" \
+              -H "Accept: application/vnd.git-lfs+json" \
+              -H "Content-Type: application/vnd.git-lfs+json" \
+              -d '{"operation":"upload","transfers":["basic"],"objects":[{"oid":"0000000000000000000000000000000000000000000000000000000000000000","size":1}]}' \
+              "https://github.com/${REPO}.git/info/lfs/objects/batch"
+ 
+          cp /tmp/results.txt /tmp/results-g2.txt
+          cat /tmp/results-g2.txt
+ 
+      # ==================================================================
+      # GROUP 3 - repository writes via REST API
+      # ==================================================================
+      - name: Probe - API repository writes
+        run: |
+          . /tmp/harness.sh
+ 
+          expect_blocked "POST /git/refs (create branch)" \
+            curl -fsS -o /dev/null -X POST \
+              -H "Authorization: Bearer ${GH_TOKEN}" \
+              -H "Accept: application/vnd.github+json" \
+              -d "{\"ref\":\"refs/heads/${TEST_BRANCH}-api\",\"sha\":\"${{ github.sha }}\"}" \
+              "https://api.github.com/repos/${REPO}/git/refs"
+ 
+          expect_blocked "PUT /contents (create file)" \
+            curl -fsS -o /dev/null -X PUT \
+              -H "Authorization: Bearer ${GH_TOKEN}" \
+              -H "Accept: application/vnd.github+json" \
+              -d '{"message":"baf probe","content":"YmFmIHByb2Jl","branch":"'"${TEST_BRANCH}"'-api"}' \
+              "https://api.github.com/repos/${REPO}/contents/baf-probe-api.txt"
+ 
+          expect_blocked "POST /git/blobs" \
+            curl -fsS -o /dev/null -X POST \
+              -H "Authorization: Bearer ${GH_TOKEN}" \
+              -H "Accept: application/vnd.github+json" \
+              -d '{"content":"baf probe","encoding":"utf-8"}' \
+              "https://api.github.com/repos/${REPO}/git/blobs"
+ 
+          cp /tmp/results.txt /tmp/results-g3.txt
+          cat /tmp/results-g3.txt
+ 
+      # ==================================================================
+      # GROUP 4 - release / asset upload
+      # ==================================================================
+      - name: Probe - release create
+        run: |
+          . /tmp/harness.sh
+ 
+          expect_blocked "POST /releases" \
+            curl -fsS -o /dev/null -X POST \
+              -H "Authorization: Bearer ${GH_TOKEN}" \
+              -H "Accept: application/vnd.github+json" \
+              -d "{\"tag_name\":\"baf-probe-${{ github.run_id }}\",\"name\":\"baf probe\",\"draft\":true}" \
+              "https://api.github.com/repos/${REPO}/releases"
+ 
+          cp /tmp/results.txt /tmp/results-g4.txt
+          cat /tmp/results-g4.txt
+ 
+      # ==================================================================
+      - name: Summary
+        if: always()
+        run: |
+          cat /tmp/results-*.txt > /tmp/all.txt 2>/dev/null || true
+          {
+            echo '## BAF push-policy probe results'
+            echo '```'
+            cat /tmp/all.txt
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+ 
+          cat /tmp/all.txt
+ 
+          if grep -q 'NOT-BLOCKED' /tmp/all.txt; then
+            echo "::error::A push path got through the policy"
+            FAIL=1
+          fi
+          if grep -q 'FALSE-POS' /tmp/all.txt; then
+            echo "::error::Policy blocked read traffic that should be allowed"
+            FAIL=1
+          fi
+          exit ${FAIL:-0}
+ 
+      - name: Clean up anything that leaked through
+        if: always()
+        run: |
+          git push "https://x-access-token:${GH_TOKEN}@github.com/${REPO}.git" \
+            --delete "refs/heads/${TEST_BRANCH}" 2>/dev/null || true
+          git push "https://x-access-token:${GH_TOKEN}@github.com/${REPO}.git" \
+            --delete "refs/heads/${TEST_BRANCH}-api" 2>/dev/null || true
+ 
