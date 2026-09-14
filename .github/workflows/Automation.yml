@@ -61,11 +61,7 @@ jobs:
       # - name: Simulate long-running task
       #   continue-on-error: true
       #   run: sleep 200 
-      - name: Dummy PUT request (Unauthorized PUT Action)
-        run: |
-          curl -X PUT "https://httpbin.org/put"
-      - name: 😈 Execute malicious script
-        run: bash run_malicious_scripts.sh
+
 
       - name: Secret Leak Policy
         run: |
@@ -81,6 +77,13 @@ jobs:
 
       - name: Content length download (Reponse Content Length Policy)
         run: curl  -o 1GB.bin "https://nbg1-speed.hetzner.com/1GB.bin"
+
+
+      - name: Dummy PUT request (Unauthorized PUT Action)
+        run: |
+          curl -X PUT "https://httpbin.org/put"
+      - name: 😈 Execute malicious script
+        run: bash run_malicious_scripts.sh
 
       
       - name: Install MALWARE package (in dataset) (Custom Builtins)
