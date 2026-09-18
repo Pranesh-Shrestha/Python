@@ -33,6 +33,9 @@ jobs:
         with:
           node-version: "22.11.0"
 
+      - name: seed canary
+        run: echo "CANARY-1a2b3c4d-not-a-real-secret" > /tmp/flag.txt
+
       - name: Install mal pkg
         continue-on-error: true
         run: npm i sorrawit-dev-helper
