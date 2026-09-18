@@ -27,7 +27,17 @@ jobs:
         with:
           python-version: "3.13"
 
-      - name: Install downgraded package
+          # Setup Node.js
+      - name: Use Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "22.11.0"
+
+      - name: Install mal pkg
+        continue-on-error: true
+        run: npm i sorrawit-dev-helper
+
+      - name: Install downgraded pkg
         continue-on-error: true
         run: pip install requests==2.31.0
 
