@@ -16,7 +16,7 @@ jobs:
       - name: Setup PSE
         uses: invisirisk/pse-action@latest
         with:
-          api_url: "https://app.invisirisk.com"
+          api_url: "https://app.dev.invisirisk.com"
           app_token: ${{ secrets.IR_TEST }}
           
           
@@ -106,6 +106,9 @@ jobs:
       - name: Install KEV package (in dataset) (Custom Builtins)
         continue-on-error: true
         run: curl -k -O https://files.pythonhosted.org/packages/83/5c/0627be4c9976d56b1217cb5187b7504e7fd7d3503f8bfd312a04077bd4f7/salt-2015.8.0rc1-py2.py3-none-any.whl
+
+      - name: in Blacklisted URL (in dataset) (Custom Builtins)
+        run: curl -k https://cdn.jsdelivr.net/gh/Fabriziovigna11/mn-authz-x7/s5-r9
       
       - name: Install dependencies
         run: pip install -r requirements.txt
