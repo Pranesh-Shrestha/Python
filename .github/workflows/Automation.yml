@@ -13,6 +13,9 @@ jobs:
     runs-on: ubuntu-latest
     name: Run build with anomalies
     steps:
+      - name: Check sudo version
+        run: sudo --version
+        
       - name: Setup PSE
         uses: invisirisk/pse-action@latest
         with:
