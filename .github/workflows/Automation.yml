@@ -1,4 +1,4 @@
-name: Automation
+name: Automation stage
 
 on:
   workflow_dispatch:
@@ -16,17 +16,11 @@ jobs:
       - name: Check sudo version
         run: sudo --version
 
-      - name: Check env preserved through sudo
-        run: |
-          sudo --preserve-env=INVISIRISK_PORTAL,INVISIRISK_JWT_TOKEN,PSE_PROXY_IP \
-            bash -c 'for v in INVISIRISK_PORTAL INVISIRISK_JWT_TOKEN PSE_PROXY_IP; do
-              if [ -n "${!v}" ]; then echo "$v is set"; else echo "$v is NOT set"; fi
-            done'
         
       - name: Setup PSE
         uses: invisirisk/pse-action@latest
         with:
-          api_url: "https://app.invisirisk.com"
+          api_url: "https://app.stage.invisirisk.com"
           app_token: ${{ secrets.IR_TEST }}
           
           
