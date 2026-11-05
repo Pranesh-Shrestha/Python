@@ -1,0 +1,50 @@
+name: too-old-os-check
+on: workflow_dispatch
+
+jobs:
+  too-old:
+    runs-on: ubuntu-latest
+    container: ${{ matrix.image }}
+    env:
+      ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION: true
+      ACTIONS_RUNNER_FORCE_ACTIONS_NODE_VERSION: node16
+    strategy:
+      fail-fast: false
+      matrix:
+        image:
+          - ubuntu:16.04
+          - debian:9
+          - centos:7.0.1406
+          - centos:7.1.1503
+          - centos:7.2.1511
+          - centos:7.3.1611
+          - centos:7.4.1708
+          - centos:7.5.1804
+    steps:
+      - name: Install sudo (pinned to that release's version)
+        env:
+          IMAGE: ${{ matrix.image }}
+        run: |
+          case "$IMAGE" in
+            ubuntu:*)
+              apt-get update && apt-get install -y sudo ca-certificates curl ;;
+            debian:9)
+              echo "deb http://archive.debian.org/debian stretch main" > /etc/apt/sources.list
+              apt-get -o Acquire::Check-Valid-Until=false update && apt-get install -y sudo ca-certificates curl ;;
+            centos:*)
+              v="${IMAGE#centos:}"
+              rm -f /etc/yum.repos.d/*.repo
+              printf '[base]\nname=base\nbaseurl=http://vault.centos.org/%s/os/x86_64/\ngpgcheck=0\n' "$v" > /etc/yum.repos.d/vault.repo
+              yum install -y sudo ca-certificates curl ;;
+          esac
+
+      - name: Show sudo and glibc version
+        run: |
+          sudo -V | head -1
+          ldd --version | head -1
+
+      - name: Setup PSE
+        uses: invisirisk/pse-action@latest
+        with:
+          api_url: "https://app.dev.invisirisk.com"
+          app_token: ${{ secrets.IR_TEST_DEV }}
